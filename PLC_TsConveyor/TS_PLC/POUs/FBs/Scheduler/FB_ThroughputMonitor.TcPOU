@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_ThroughputMonitor" Id="{b3da767e-ed2c-4e91-96fe-30b4bace5f9e}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ThroughputMonitor
+VAR_INPUT
+    DonePulse : BOOL;     // one-scan TRUE when a transfer completes
+    Reset     : BOOL;     // reset counters
+END_VAR
+VAR_OUTPUT
+    TotalCount        : UDINT;   // total carriers processed
+    PerMinute         : UDINT;   // carriers per minute
+    PerHour           : UDINT;   // carriers per hour
+    LastSampleCount   : UDINT;   // carriers seen in last sample window
+END_VAR
+VAR
+    tSample   : TON;      // 1-minute sampling timer
+    prevDone  : BOOL;
+    lastTotal : UDINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// --- Reset logic ---
+IF Reset THEN
+    TotalCount := 0;
+    PerMinute := 0;
+    PerHour := 0;
+    LastSampleCount := 0;
+    lastTotal := 0;
+END_IF
+
+
+// --- Count Done pulses ---
+IF DonePulse AND NOT prevDone THEN
+    TotalCount := TotalCount + 1;
+END_IF
+prevDone := DonePulse;
+
+
+// --- Run 60s timer ---
+tSample(IN := TRUE, PT := T#60s);
+
+// When timer completes → sample throughput
+IF tSample.Q THEN
+    LastSampleCount := TotalCount - lastTotal; // carriers in last 60s
+    PerMinute := LastSampleCount;
+    PerHour   := LastSampleCount * 60;
+    lastTotal := TotalCount;
+
+    // restart timer
+    tSample(IN := FALSE);
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="FB_ThroughputMonitor">
+      <LineId Id="24" Count="28" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

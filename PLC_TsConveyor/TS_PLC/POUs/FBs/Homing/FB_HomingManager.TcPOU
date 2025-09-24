@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_HomingManager" Id="{b0fda3d4-02aa-4d7d-a232-6d668b217112}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_HomingManager
+VAR_INPUT
+    StartHoming : BOOL;
+    Reset       : BOOL;
+
+    // LTU inputs
+    LTU_12_3_PosTop, LTU_12_3_PosBottom, LTU_12_3_PosMid, LTU_12_3_Running : BOOL;
+    LTU_3_6_PosTop, LTU_3_6_PosBottom, LTU_3_6_PosMid, LTU_3_6_Running     : BOOL;
+    LTU_9_12_PosTop, LTU_9_12_PosBottom, LTU_9_12_PosMid, LTU_9_12_Running : BOOL;
+    LTU_6_9_PosTop, LTU_6_9_PosBottom, LTU_6_9_PosMid, LTU_6_9_Running     : BOOL;
+END_VAR
+VAR_OUTPUT
+    LTU_12_3_CmdMoveUp, LTU_12_3_CmdMoveDown : BOOL;
+    LTU_3_6_CmdMoveUp,  LTU_3_6_CmdMoveDown  : BOOL;
+    LTU_9_12_CmdMoveUp, LTU_9_12_CmdMoveDown : BOOL;
+    LTU_6_9_CmdMoveUp,  LTU_6_9_CmdMoveDown  : BOOL;
+
+    AllDone   : BOOL;
+    AnyError  : BOOL;
+END_VAR
+VAR
+    Home_12_3 : FB_HomingLTU;
+    Home_3_6  : FB_HomingLTU;
+    Home_9_12 : FB_HomingLTU;
+    Home_6_9  : FB_HomingLTU;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// --- Run all homing FBs in parallel ---
+Home_12_3(
+    StartHoming := StartHoming,
+    Reset       := Reset,
+    PosTop      := LTU_12_3_PosTop,
+    PosBottom   := LTU_12_3_PosBottom,
+    PosMid      := LTU_12_3_PosMid,
+    Running     := LTU_12_3_Running,
+    CmdMoveDown => LTU_12_3_CmdMoveDown,
+    CmdMoveUp   => LTU_12_3_CmdMoveUp
+);
+
+Home_3_6(
+    StartHoming := StartHoming,
+    Reset       := Reset,
+    PosTop      := LTU_3_6_PosTop,
+    PosBottom   := LTU_3_6_PosBottom,
+    PosMid      := LTU_3_6_PosMid,
+    Running     := LTU_3_6_Running,
+    CmdMoveDown => LTU_3_6_CmdMoveDown,
+    CmdMoveUp   => LTU_3_6_CmdMoveUp
+);
+
+Home_9_12(
+    StartHoming := StartHoming,
+    Reset       := Reset,
+    PosTop      := LTU_9_12_PosTop,
+    PosBottom   := LTU_9_12_PosBottom,
+    PosMid      := LTU_9_12_PosMid,
+    Running     := LTU_9_12_Running,
+    CmdMoveDown => LTU_9_12_CmdMoveDown,
+    CmdMoveUp   => LTU_9_12_CmdMoveUp
+);
+
+Home_6_9(
+    StartHoming := StartHoming,
+    Reset       := Reset,
+    PosTop      := LTU_6_9_PosTop,
+    PosBottom   := LTU_6_9_PosBottom,
+    PosMid      := LTU_6_9_PosMid,
+    Running     := LTU_6_9_Running,
+    CmdMoveDown => LTU_6_9_CmdMoveDown,
+    CmdMoveUp   => LTU_6_9_CmdMoveUp
+);
+
+
+// --- Manager Outputs ---
+AllDone  := Home_12_3.Done AND Home_3_6.Done AND Home_9_12.Done AND Home_6_9.Done;
+AnyError := Home_12_3.Error OR Home_3_6.Error OR Home_9_12.Error OR Home_6_9.Error;]]></ST>
+    </Implementation>
+    <LineIds Name="FB_HomingManager">
+      <LineId Id="34" Count="47" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

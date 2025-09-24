@@ -17,7 +17,7 @@
 		</System>
 		<Plc>
 			<Project GUID="{0BE80D7A-6E91-4DF6-A420-865A662F5102}" Name="TS_PLC" PrjFilePath="TS_PLC\TS_PLC.plcproj" TmcFilePath="TS_PLC\TS_PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{1EE3ECBF-E933-A336-BB9A-8DD5F063A730}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{5F040E54-358B-480E-C888-CBABE503F9DB}">
 					<Name>TS_PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -421,11 +421,6 @@
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>PRG_SIM.SimPurp3_9_2.Occupied</Name>
-							<Comment><![CDATA[ TRUE when carrier is latched at stopper]]></Comment>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
 							<Name>PRG_SIM.SimReader_12.ReaderValue</Name>
 							<Comment><![CDATA[ chosen destination]]></Comment>
 							<Type>INT</Type>
@@ -434,6 +429,11 @@
 							<Name>PRG_SIM.SimReader_3.ReaderValue</Name>
 							<Comment><![CDATA[ chosen destination]]></Comment>
 							<Type>INT</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimPurp3_9_2.Occupied</Name>
+							<Comment><![CDATA[ TRUE when carrier is latched at stopper]]></Comment>
+							<Type>BOOL</Type>
 						</Var>
 						<Var>
 							<Name>PRG_SIM.SimReader_6.ReaderValue</Name>

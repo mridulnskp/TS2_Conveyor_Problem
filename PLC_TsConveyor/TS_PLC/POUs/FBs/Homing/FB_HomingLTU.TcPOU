@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_HomingLTU" Id="{dcb6392a-c75e-4622-b7ba-52e8574eccbe}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_HomingLTU
+VAR_INPUT
+    StartHoming : BOOL;
+    Reset       : BOOL;
+
+    PosTop      : BOOL;
+    PosBottom   : BOOL;
+    PosMid      : BOOL;
+    Running     : BOOL;
+END_VAR
+VAR_OUTPUT
+    CmdMoveDown : BOOL;
+    CmdMoveUp   : BOOL;
+    Done        : BOOL;
+    Error       : BOOL;
+END_VAR
+VAR
+    state       : INT := 0;
+    tTimeout    : TON;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE state OF
+    0: // IDLE
+        CmdMoveDown := FALSE;
+        CmdMoveUp   := FALSE;
+        Done  := FALSE;
+        Error := FALSE;
+
+        IF StartHoming THEN
+            state := 1;
+        END_IF
+
+    1: // MOVE DOWN
+        CmdMoveDown := TRUE;
+        CmdMoveUp   := FALSE;
+
+        tTimeout(IN:=TRUE, PT:=T#10s);
+
+        IF PosBottom THEN
+            CmdMoveDown := FALSE;
+            Done := TRUE;
+            tTimeout(IN:=FALSE);
+            state := 2;
+        ELSIF tTimeout.Q THEN
+            Error := TRUE;
+            CmdMoveDown := FALSE;
+            state := 99;
+        END_IF
+
+    2: // HOMED
+        // Hold here until reset
+        CmdMoveDown := FALSE;
+        CmdMoveUp   := FALSE;
+        Done := TRUE;
+        IF Reset THEN
+            state := 0;
+        END_IF
+
+    99: // ERROR
+        CmdMoveDown := FALSE;
+        CmdMoveUp   := FALSE;
+        Error := TRUE;
+        IF Reset THEN
+            state := 0;
+        END_IF
+END_CASE]]></ST>
+    </Implementation>
+    <LineIds Name="FB_HomingLTU">
+      <LineId Id="29" Count="43" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

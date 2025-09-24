@@ -43,6 +43,12 @@
     <Compile Include="POUs\FBs\FB_Stopper.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\FBs\Homing\FB_HomingLTU.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\FBs\Homing\FB_HomingManager.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\FBs\Interchange\FB_TransferChain_LowerToUpper.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -65,6 +71,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\FBs\Scheduler\FB_Scheduler_Queue.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\FBs\Scheduler\FB_ThroughputMonitor.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\MAIN.TcPOU">
@@ -97,6 +106,7 @@
     <Folder Include="GVLs" />
     <Folder Include="POUs\FBs" />
     <Folder Include="POUs\FBs\Interchange" />
+    <Folder Include="POUs\FBs\Homing" />
     <Folder Include="POUs\FBs\Scheduler" />
     <Folder Include="POUs\FCs" />
     <Folder Include="POUs\Simulation" />

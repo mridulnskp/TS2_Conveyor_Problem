@@ -66,8 +66,16 @@ VAR
 	Transfer_9_6 : FB_TransferChain_UpperToLower;
 	Transfer_3_12 : FB_TransferChain_UpperToLower;
 	
+	Throughput : FB_ThroughputMonitor;
+	HomingMgr : FB_HomingManager;
 	
 	DebugWhoWroteBlue6: STRING(128);
+	AllLTUsHomed: BOOL;
+	HomingError: BOOL;
+	ResetGlobal: BOOL;
+	SchedulerBusy: BOOL;
+	SchedulerQCount: INT;
+	StartHomingGlobal: BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -208,34 +216,109 @@ Reader3(TriggerRead:= ,Dest:=6, ReaderValue=> , Valid=> );
 Reader6(TriggerRead:= ,Dest:=9, ReaderValue=> , Valid=> );	
 Reader9(TriggerRead:= ,Dest:=6, ReaderValue=> , Valid=> );	
 
+// === Homing Manager ===
+HomingMgr(
+    StartHoming := StartHomingGlobal,   // your button / auto-start flag
+    Reset       := ,         // global reset button
+
+    LTU_12_3_PosTop    := LTU_12_3.PosTop,
+    LTU_12_3_PosBottom := LTU_12_3.PosBottom,
+    LTU_12_3_PosMid    := LTU_12_3.PosMid,
+    LTU_12_3_Running   := LTU_12_3.IsRunning,
+
+    LTU_3_6_PosTop    := LTU_3_6.PosTop,
+    LTU_3_6_PosBottom := LTU_3_6.PosBottom,
+    LTU_3_6_PosMid    := LTU_3_6.PosMid,
+    LTU_3_6_Running   := LTU_3_6.IsRunning,
+
+    LTU_9_12_PosTop    := LTU_9_12.PosTop,
+    LTU_9_12_PosBottom := LTU_9_12.PosBottom,
+    LTU_9_12_PosMid    := LTU_9_12.PosMid,
+    LTU_9_12_Running   := LTU_9_12.IsRunning,
+
+    LTU_6_9_PosTop    := LTU_6_9.PosTop,
+    LTU_6_9_PosBottom := LTU_6_9.PosBottom,
+    LTU_6_9_PosMid    := LTU_6_9.PosMid,
+    LTU_6_9_Running   := LTU_6_9.IsRunning,
+
+    LTU_12_3_CmdMoveUp   => LTU_12_3.CmdMoveUp,
+    LTU_12_3_CmdMoveDown => LTU_12_3.CmdMoveDown,
+
+    LTU_3_6_CmdMoveUp   => LTU_3_6.CmdMoveUp,
+    LTU_3_6_CmdMoveDown => LTU_3_6.CmdMoveDown,
+
+    LTU_9_12_CmdMoveUp   => LTU_9_12.CmdMoveUp,
+    LTU_9_12_CmdMoveDown => LTU_9_12.CmdMoveDown,
+
+    LTU_6_9_CmdMoveUp   => LTU_6_9.CmdMoveUp,
+    LTU_6_9_CmdMoveDown => LTU_6_9.CmdMoveDown,
+
+    AllDone   => AllLTUsHomed,
+    AnyError  => HomingError
+);
+
+// === Scheduler (enabled only after homing) ===
+IF AllLTUsHomed AND NOT HomingError THEN
+    Scheduler(
+        Reader12_Valid := Reader12.Valid,
+        Reader12_Value := Reader12.ReaderValue,
+        Reader3_Valid  := Reader3.Valid,
+        Reader3_Value  := Reader3.ReaderValue,
+        Reader6_Valid  := Reader6.Valid,
+        Reader6_Value  := Reader6.ReaderValue,
+        Reader9_Valid  := Reader9.Valid,
+        Reader9_Value  := Reader9.ReaderValue,
+
+        // Done flags from all transfers
+        T12_6_Done := Transfer_12_6.Done,
+        T6_12_Done := Transfer_6_12.Done,
+        T9_3_Done  := Transfer_9_3.Done,
+        T3_9_Done  := Transfer_3_9.Done,
+        T12_3_Done := Transfer_12_3.Done,
+        T6_9_Done  := Transfer_6_9.Done,
+        T3_6_Done  := Transfer_3_6.Done,
+        T9_12_Done := Transfer_9_12.Done,
+        T12_9_Done := Transfer_12_9.Done,
+        T6_3_Done  := Transfer_6_3.Done,
+        T9_6_Done  := Transfer_9_6.Done,
+        T3_12_Done := Transfer_3_12.Done,
+
+        Reset := 
+    );
+ELSE
+    // Prevent scheduler outputs until homed
+    SchedulerBusy := FALSE;
+END_IF
+
+
 // Scheduler -- Only start a transfer if the system is free (no other active transfer)
 // Run Scheduler
-Scheduler(
-    Reader12_Valid := Reader12.Valid,
-    Reader12_Value := Reader12.ReaderValue,
-    Reader3_Valid  := Reader3.Valid,
-    Reader3_Value  := Reader3.ReaderValue,
-    Reader6_Valid  := Reader6.Valid,
-    Reader6_Value  := Reader6.ReaderValue,
-    Reader9_Valid  := Reader9.Valid,
-    Reader9_Value  := Reader9.ReaderValue,
+//Scheduler(
+//    Reader12_Valid := Reader12.Valid,
+//    Reader12_Value := Reader12.ReaderValue,
+//    Reader3_Valid  := Reader3.Valid,
+//    Reader3_Value  := Reader3.ReaderValue,
+//    Reader6_Valid  := Reader6.Valid,
+//    Reader6_Value  := Reader6.ReaderValue,
+//    Reader9_Valid  := Reader9.Valid,
+//    Reader9_Value  := Reader9.ReaderValue,
 
-    // pass Done flags from all transfer FBs
-    T12_6_Done := Transfer_12_6.Done,
-    T6_12_Done := Transfer_6_12.Done,
-    T9_3_Done  := Transfer_9_3.Done,
-    T3_9_Done  := Transfer_3_9.Done,
-    T12_3_Done := Transfer_12_3.Done,
-    T6_9_Done  := Transfer_6_9.Done,
-    T3_6_Done  := Transfer_3_6.Done,
-    T9_12_Done := Transfer_9_12.Done,
-    T12_9_Done := Transfer_12_9.Done,
-    T6_3_Done  := Transfer_6_3.Done,
-    T9_6_Done  := Transfer_9_6.Done,
-    T3_12_Done := Transfer_3_12.Done,
+//    // pass Done flags from all transfer FBs
+//    T12_6_Done := Transfer_12_6.Done,
+//    T6_12_Done := Transfer_6_12.Done,
+//    T9_3_Done  := Transfer_9_3.Done,
+//    T3_9_Done  := Transfer_3_9.Done,
+//    T12_3_Done := Transfer_12_3.Done,
+//    T6_9_Done  := Transfer_6_9.Done,
+//    T3_6_Done  := Transfer_3_6.Done,
+//    T9_12_Done := Transfer_9_12.Done,
+//    T12_9_Done := Transfer_12_9.Done,
+//    T6_3_Done  := Transfer_6_3.Done,
+//    T9_6_Done  := Transfer_9_6.Done,
+//    T3_12_Done := Transfer_3_12.Done,
 
-    Reset := 
-);
+//    Reset := 
+//);
 
 
 
@@ -631,6 +714,23 @@ ELSE
 END_CASE
 
 
+Throughput(
+    DonePulse := (
+        Transfer_12_6.Done OR
+        Transfer_6_12.Done OR
+        Transfer_9_3.Done  OR
+        Transfer_3_9.Done  OR
+        Transfer_12_3.Done OR
+        Transfer_6_9.Done  OR
+        Transfer_3_6.Done  OR
+        Transfer_9_12.Done OR
+        Transfer_12_9.Done OR
+        Transfer_6_3.Done  OR
+        Transfer_9_6.Done  OR
+        Transfer_3_12.Done
+    ),
+    Reset := 
+);
 
 ]]></ST>
     </Implementation>
@@ -670,6 +770,10 @@ END_CASE
       <LineId Id="376" Count="0" />
       <LineId Id="309" Count="1" />
       <LineId Id="349" Count="2" />
+      <LineId Id="1126" Count="0" />
+      <LineId Id="1128" Count="66" />
+      <LineId Id="1212" Count="5" />
+      <LineId Id="1127" Count="0" />
       <LineId Id="815" Count="0" />
       <LineId Id="311" Count="0" />
       <LineId Id="828" Count="26" />
@@ -712,6 +816,7 @@ END_CASE
       <LineId Id="1009" Count="0" />
       <LineId Id="1083" Count="0" />
       <LineId Id="1096" Count="0" />
+      <LineId Id="1109" Count="16" />
       <LineId Id="1081" Count="0" />
       <LineId Id="820" Count="0" />
     </LineIds>
