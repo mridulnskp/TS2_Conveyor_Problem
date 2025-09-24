@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Init" Id="{a39b6eb0-0cf2-4549-bb8d-cd9617de6e95}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Init
+VAR_INPUT
+    Reset : BOOL;   // external reset (button/flag)
+END_VAR
+VAR_IN_OUT
+    Blue12, Blue3, Blue6, Blue9 : FB_Stopper;
+    Purple9_3_1, Purple9_3_2, Purple3_9_1, Purple3_9_2 : FB_Stopper;
+    LTU_12_3, LTU_3_6, LTU_6_9, LTU_9_12 : FB_LTU;
+    Scheduler : FB_Scheduler_Queue;
+END_VAR
+VAR
+    firstScan : BOOL := TRUE;   // internal latch
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// --- Safe State Logic ---
+IF firstScan OR Reset THEN
+    // Blue stoppers (all blocking)
+    Blue12.CmdDown := TRUE;
+    Blue3.CmdDown  := TRUE;
+    Blue6.CmdDown  := TRUE;
+    Blue9.CmdDown  := TRUE;
+
+    // Purple stoppers (all blocking)
+    Purple9_3_1.CmdDown := TRUE;
+    Purple9_3_2.CmdDown := TRUE;
+    Purple3_9_1.CmdDown := TRUE;
+    Purple3_9_2.CmdDown := TRUE;
+
+    // LTUs (all idle)
+    LTU_12_3.CmdMoveUp   := FALSE;
+    LTU_12_3.CmdMoveDown := FALSE;
+    LTU_12_3.CmdRun      := FALSE;
+
+    LTU_3_6.CmdMoveUp    := FALSE;
+    LTU_3_6.CmdMoveDown  := FALSE;
+    LTU_3_6.CmdRun       := FALSE;
+
+    LTU_6_9.CmdMoveUp    := FALSE;
+    LTU_6_9.CmdMoveDown  := FALSE;
+    LTU_6_9.CmdRun       := FALSE;
+
+    LTU_9_12.CmdMoveUp   := FALSE;
+    LTU_9_12.CmdMoveDown := FALSE;
+    LTU_9_12.CmdRun      := FALSE;
+
+    // Tell Scheduler to reset itself
+    Scheduler(Reset := TRUE);
+
+    // clear firstScan latch
+    firstScan := FALSE;
+ELSE
+    // normal scheduler call, Reset=FALSE
+    Scheduler(Reset := FALSE);
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="FB_Init">
+      <LineId Id="58" Count="38" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

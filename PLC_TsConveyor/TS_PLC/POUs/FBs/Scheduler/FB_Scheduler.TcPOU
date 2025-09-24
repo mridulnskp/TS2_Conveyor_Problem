@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Scheduler" Id="{c2e6a3ae-31e5-46b8-9ca8-6c1fa934b396}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Scheduler
+VAR_INPUT
+    // Reader inputs
+    Reader12_Valid : BOOL;
+    Reader12_Value : INT;
+
+    Reader3_Valid  : BOOL;
+    Reader3_Value  : INT;
+
+    Reader6_Valid  : BOOL;
+    Reader6_Value  : INT;
+
+    Reader9_Valid  : BOOL;
+    Reader9_Value  : INT;
+
+    // Transfer Done flags (from all FBs)
+    T12_6_Done, T6_12_Done : BOOL;
+    T9_3_Done,  T3_9_Done  : BOOL;
+    T12_3_Done, T6_9_Done  : BOOL;
+    T3_6_Done,  T9_12_Done : BOOL;
+    T12_9_Done, T6_3_Done  : BOOL;
+    T9_6_Done,  T3_12_Done : BOOL;
+
+    Reset : BOOL;
+END_VAR
+VAR_OUTPUT
+    // Start requests to transfers
+    Start_12_6, Start_6_12 : BOOL;
+    Start_9_3,  Start_3_9  : BOOL;
+    Start_12_3, Start_6_9  : BOOL;
+    Start_3_6,  Start_9_12 : BOOL;
+    Start_12_9, Start_6_3  : BOOL;
+    Start_9_6,  Start_3_12 : BOOL;
+
+    Busy : BOOL;
+END_VAR
+VAR
+    activeRoute : INT := 0; // currently active route ID
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// ------------------- MAIN LOGIC -------------------
+
+IF Reset THEN
+    Busy := FALSE;
+    activeRoute := 0;
+END_IF
+
+// --- If not busy, pick a new route ---
+IF NOT Busy THEN
+    // clear all start outputs
+    Start_12_6 := FALSE; Start_6_12 := FALSE;
+    Start_9_3  := FALSE; Start_3_9  := FALSE;
+    Start_12_3 := FALSE; Start_6_9  := FALSE;
+    Start_3_6  := FALSE; Start_9_12 := FALSE;
+    Start_12_9 := FALSE; Start_6_3  := FALSE;
+    Start_9_6  := FALSE; Start_3_12 := FALSE;
+
+    // check Readers one by one
+    IF Reader12_Valid THEN
+        CASE Reader12_Value OF
+            6:  Start_12_6 := TRUE; activeRoute := 126; Busy := TRUE;
+            3:  Start_12_3 := TRUE; activeRoute := 123; Busy := TRUE;
+            9:  Start_12_9 := TRUE; activeRoute := 129; Busy := TRUE;
+        END_CASE
+    ELSIF Reader6_Valid THEN
+        CASE Reader6_Value OF
+            12: Start_6_12 := TRUE; activeRoute := 612; Busy := TRUE;
+            9:  Start_6_9  := TRUE; activeRoute := 69;  Busy := TRUE;
+            3:  Start_6_3  := TRUE; activeRoute := 63;  Busy := TRUE;
+        END_CASE
+    ELSIF Reader3_Valid THEN
+        CASE Reader3_Value OF
+            9:  Start_3_9  := TRUE; activeRoute := 39;  Busy := TRUE;
+            6:  Start_3_6  := TRUE; activeRoute := 36;  Busy := TRUE;
+            12: Start_3_12 := TRUE; activeRoute := 312; Busy := TRUE;
+        END_CASE
+    ELSIF Reader9_Valid THEN
+        CASE Reader9_Value OF
+            3:  Start_9_3  := TRUE; activeRoute := 93;  Busy := TRUE;
+            12: Start_9_12 := TRUE; activeRoute := 912; Busy := TRUE;
+            6:  Start_9_6  := TRUE; activeRoute := 96;  Busy := TRUE;
+        END_CASE
+    END_IF
+
+// --- If busy, wait until the active transfer finishes ---
+ELSE
+    CASE activeRoute OF
+        126: IF T12_6_Done THEN Busy := FALSE; activeRoute := 0; END_IF
+        612: IF T6_12_Done THEN Busy := FALSE; activeRoute := 0; END_IF
+        93 : IF T9_3_Done  THEN Busy := FALSE; activeRoute := 0; END_IF
+        39 : IF T3_9_Done  THEN Busy := FALSE; activeRoute := 0; END_IF
+        123: IF T12_3_Done THEN Busy := FALSE; activeRoute := 0; END_IF
+        69 : IF T6_9_Done  THEN Busy := FALSE; activeRoute := 0; END_IF
+        36 : IF T3_6_Done  THEN Busy := FALSE; activeRoute := 0; END_IF
+        912: IF T9_12_Done THEN Busy := FALSE; activeRoute := 0; END_IF
+        129: IF T12_9_Done THEN Busy := FALSE; activeRoute := 0; END_IF
+        63 : IF T6_3_Done  THEN Busy := FALSE; activeRoute := 0; END_IF
+        96 : IF T9_6_Done  THEN Busy := FALSE; activeRoute := 0; END_IF
+        312: IF T3_12_Done THEN Busy := FALSE; activeRoute := 0; END_IF
+    END_CASE
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="FB_Scheduler">
+      <LineId Id="114" Count="59" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

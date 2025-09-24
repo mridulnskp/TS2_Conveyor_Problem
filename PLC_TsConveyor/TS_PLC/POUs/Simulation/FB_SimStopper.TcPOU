@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_SimStopper" Id="{f2dc6740-4b5e-4b9e-a826-e01f60f6120a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_SimStopper
+VAR_INPUT
+    CmdDown    AT%I*: BOOL;   // from MAIN: TRUE=block, FALSE=release
+    CarrierIn  at%I*: BOOL;   // simulated incoming carrier (from conveyor or LTU)
+END_VAR
+VAR_OUTPUT
+    Occupied   AT%Q*: BOOL;   // TRUE when carrier is latched at stopper
+    CarrierOut : BOOL;   // TRUE when carrier passes through
+END_VAR
+VAR
+    Latched : BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+
+// Latch carrier if stopper is down and one arrives
+IF CarrierIn AND CmdDown THEN
+    Latched := TRUE;
+END_IF
+
+// Release carrier if stopper is up
+IF NOT CmdDown AND Latched THEN
+    Latched := FALSE;
+    CarrierOut := TRUE;      // carrier moves forward
+ELSE
+    CarrierOut := FALSE;     // default
+END_IF
+
+// Occupied means stopper currently holding a carrier
+Occupied := Latched;
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_SimStopper">
+      <LineId Id="21" Count="16" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

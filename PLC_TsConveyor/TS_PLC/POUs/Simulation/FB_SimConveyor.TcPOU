@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_SimConveyor" Id="{e85983e3-7d99-45f8-8cbd-d7d5b6579aad}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_SimConveyor
+VAR_INPUT
+    MotorRun AT%I*: BOOL;   // from MAIN
+    Release  AT%I*: BOOL;   // TRUE = stopper released
+END_VAR
+VAR_OUTPUT
+    MotorOK     AT%Q*: BOOL;   // always TRUE in sim
+    RunningIn   AT%Q*: BOOL;   // motor feedback
+    CarrierAtIn : BOOL;   // entry sensor
+    CarrierAtOut: BOOL;   // exit sensor
+END_VAR
+VAR
+    tRun : TON;
+    CarrierPresent : BOOL := TRUE;  // assume one carrier available at start
+    TravelTime     : TIME := T#3S;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+MotorOK   := TRUE;
+RunningIn := MotorRun;
+
+// Start travel timer if conveyor runs and release open
+tRun(IN := MotorRun AND Release AND CarrierPresent, PT := TravelTime);
+
+// Entry sensor active while carrier present
+CarrierAtIn := CarrierPresent;
+
+// When travel done → move carrier to exit
+IF CarrierPresent AND tRun.Q THEN
+    CarrierAtIn  := FALSE;
+    CarrierAtOut := TRUE;
+    CarrierPresent := FALSE;
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_SimConveyor">
+      <LineId Id="61" Count="15" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

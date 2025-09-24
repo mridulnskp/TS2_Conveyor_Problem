@@ -1,0 +1,938 @@
+<?xml version="1.0"?>
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.53">
+	<Project ProjectGUID="{2208E27E-5334-4C98-8ED2-05A2CD70A249}" Target64Bit="true" ShowHideConfigurations="#x6">
+		<System>
+			<Settings MaxCpus="8" NonWinCpus="6" Packages="8">
+				<Cpu CpuId="2"/>
+				<Cpu CpuId="3"/>
+			</Settings>
+			<Tasks>
+				<Task Id="3" Priority="20" CycleTime="100000" AmsPort="350" AdtTasks="true">
+					<Name>PlcTask</Name>
+				</Task>
+				<Task Id="4" Priority="1" CycleTime="100000" AmsPort="351" Affinity="#x00000008" AdtTasks="true">
+					<Name>SimTask</Name>
+				</Task>
+			</Tasks>
+		</System>
+		<Plc>
+			<Project GUID="{0BE80D7A-6E91-4DF6-A420-865A662F5102}" Name="TS_PLC" PrjFilePath="TS_PLC\TS_PLC.plcproj" TmcFilePath="TS_PLC\TS_PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{1EE3ECBF-E933-A336-BB9A-8DD5F063A730}">
+					<Name>TS_PLC Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+					<Vars VarGrpType="1">
+						<Name>SimTask Inputs</Name>
+						<Var>
+							<Name>PRG_SIM.SimConv12_6.MotorRun</Name>
+							<Comment><![CDATA[ from MAIN]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimConv12_6.Release</Name>
+							<Comment><![CDATA[ TRUE = stopper released]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimConv6_12.MotorRun</Name>
+							<Comment><![CDATA[ from MAIN]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimConv6_12.Release</Name>
+							<Comment><![CDATA[ TRUE = stopper released]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimConv3_9.MotorRun</Name>
+							<Comment><![CDATA[ from MAIN]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimConv3_9.Release</Name>
+							<Comment><![CDATA[ TRUE = stopper released]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimConv9_3.MotorRun</Name>
+							<Comment><![CDATA[ from MAIN]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimConv9_3.Release</Name>
+							<Comment><![CDATA[ TRUE = stopper released]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimBlue12.CmdDown</Name>
+							<Comment><![CDATA[ from MAIN: TRUE=block, FALSE=release]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimBlue12.CarrierIn</Name>
+							<Comment><![CDATA[ simulated incoming carrier (from conveyor or LTU)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimBlue6.CmdDown</Name>
+							<Comment><![CDATA[ from MAIN: TRUE=block, FALSE=release]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimBlue6.CarrierIn</Name>
+							<Comment><![CDATA[ simulated incoming carrier (from conveyor or LTU)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimBlue3.CmdDown</Name>
+							<Comment><![CDATA[ from MAIN: TRUE=block, FALSE=release]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimBlue3.CarrierIn</Name>
+							<Comment><![CDATA[ simulated incoming carrier (from conveyor or LTU)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimBlue9.CmdDown</Name>
+							<Comment><![CDATA[ from MAIN: TRUE=block, FALSE=release]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimBlue9.CarrierIn</Name>
+							<Comment><![CDATA[ simulated incoming carrier (from conveyor or LTU)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU12_3.CmdPush</Name>
+							<Comment><![CDATA[ push motor command from MAIN (O_LTU_xx_MotorRun)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU12_3.MoveUp</Name>
+							<Comment><![CDATA[ lift up (hold to continue stepping up)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU12_3.MoveDown</Name>
+							<Comment><![CDATA[ lift down (hold to continue stepping down)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU3_6.CmdPush</Name>
+							<Comment><![CDATA[ push motor command from MAIN (O_LTU_xx_MotorRun)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU3_6.MoveUp</Name>
+							<Comment><![CDATA[ lift up (hold to continue stepping up)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU3_6.MoveDown</Name>
+							<Comment><![CDATA[ lift down (hold to continue stepping down)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU6_9.CmdPush</Name>
+							<Comment><![CDATA[ push motor command from MAIN (O_LTU_xx_MotorRun)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU6_9.MoveUp</Name>
+							<Comment><![CDATA[ lift up (hold to continue stepping up)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU6_9.MoveDown</Name>
+							<Comment><![CDATA[ lift down (hold to continue stepping down)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU9_12.CmdPush</Name>
+							<Comment><![CDATA[ push motor command from MAIN (O_LTU_xx_MotorRun)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU9_12.MoveUp</Name>
+							<Comment><![CDATA[ lift up (hold to continue stepping up)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU9_12.MoveDown</Name>
+							<Comment><![CDATA[ lift down (hold to continue stepping down)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimPurp9_3_1.CmdDown</Name>
+							<Comment><![CDATA[ from MAIN: TRUE=block, FALSE=release]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimPurp9_3_1.CarrierIn</Name>
+							<Comment><![CDATA[ simulated incoming carrier (from conveyor or LTU)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimPurp9_3_2.CmdDown</Name>
+							<Comment><![CDATA[ from MAIN: TRUE=block, FALSE=release]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimPurp9_3_2.CarrierIn</Name>
+							<Comment><![CDATA[ simulated incoming carrier (from conveyor or LTU)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimPurp3_9_1.CmdDown</Name>
+							<Comment><![CDATA[ from MAIN: TRUE=block, FALSE=release]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimPurp3_9_1.CarrierIn</Name>
+							<Comment><![CDATA[ simulated incoming carrier (from conveyor or LTU)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimPurp3_9_2.CmdDown</Name>
+							<Comment><![CDATA[ from MAIN: TRUE=block, FALSE=release]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimPurp3_9_2.CarrierIn</Name>
+							<Comment><![CDATA[ simulated incoming carrier (from conveyor or LTU)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimReader_12.TriggerRead</Name>
+							<Comment><![CDATA[ pulse from simulation (like tTrig.Q)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimReader_3.TriggerRead</Name>
+							<Comment><![CDATA[ pulse from simulation (like tTrig.Q)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimReader_6.TriggerRead</Name>
+							<Comment><![CDATA[ pulse from simulation (like tTrig.Q)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimReader_9.TriggerRead</Name>
+							<Comment><![CDATA[ pulse from simulation (like tTrig.Q)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+					</Vars>
+					<Vars VarGrpType="2" AreaNo="1">
+						<Name>SimTask Outputs</Name>
+						<Var>
+							<Name>PRG_SIM.SimConv12_6.MotorOK</Name>
+							<Comment><![CDATA[ always TRUE in sim]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimConv12_6.RunningIn</Name>
+							<Comment><![CDATA[ motor feedback]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimConv6_12.MotorOK</Name>
+							<Comment><![CDATA[ always TRUE in sim]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimConv6_12.RunningIn</Name>
+							<Comment><![CDATA[ motor feedback]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimConv3_9.MotorOK</Name>
+							<Comment><![CDATA[ always TRUE in sim]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimConv3_9.RunningIn</Name>
+							<Comment><![CDATA[ motor feedback]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimConv9_3.MotorOK</Name>
+							<Comment><![CDATA[ always TRUE in sim]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimConv9_3.RunningIn</Name>
+							<Comment><![CDATA[ motor feedback]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimBlue12.Occupied</Name>
+							<Comment><![CDATA[ TRUE when carrier is latched at stopper]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimBlue6.Occupied</Name>
+							<Comment><![CDATA[ TRUE when carrier is latched at stopper]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimBlue3.Occupied</Name>
+							<Comment><![CDATA[ TRUE when carrier is latched at stopper]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimBlue9.Occupied</Name>
+							<Comment><![CDATA[ TRUE when carrier is latched at stopper]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU12_3.MotorOK</Name>
+							<Comment><![CDATA[ always TRUE in sim]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU12_3.PushRunning</Name>
+							<Comment><![CDATA[ push motor feedback (RunningIn)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU12_3.PosTop</Name>
+							<Comment><![CDATA[ LTU aligned with orange/top]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU12_3.PosMid</Name>
+							<Comment><![CDATA[ LTU at middle stop]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU12_3.PosBottom</Name>
+							<Comment><![CDATA[ LTU aligned with green/bottom]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU12_3.LightBarrier</Name>
+							<Comment><![CDATA[ TRUE = empty, FALSE = carrier inside]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU3_6.MotorOK</Name>
+							<Comment><![CDATA[ always TRUE in sim]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU3_6.PushRunning</Name>
+							<Comment><![CDATA[ push motor feedback (RunningIn)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU3_6.PosTop</Name>
+							<Comment><![CDATA[ LTU aligned with orange/top]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU3_6.PosMid</Name>
+							<Comment><![CDATA[ LTU at middle stop]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU3_6.PosBottom</Name>
+							<Comment><![CDATA[ LTU aligned with green/bottom]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU3_6.LightBarrier</Name>
+							<Comment><![CDATA[ TRUE = empty, FALSE = carrier inside]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU6_9.MotorOK</Name>
+							<Comment><![CDATA[ always TRUE in sim]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU6_9.PushRunning</Name>
+							<Comment><![CDATA[ push motor feedback (RunningIn)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU6_9.PosTop</Name>
+							<Comment><![CDATA[ LTU aligned with orange/top]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU6_9.PosMid</Name>
+							<Comment><![CDATA[ LTU at middle stop]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU6_9.PosBottom</Name>
+							<Comment><![CDATA[ LTU aligned with green/bottom]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU6_9.LightBarrier</Name>
+							<Comment><![CDATA[ TRUE = empty, FALSE = carrier inside]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU9_12.MotorOK</Name>
+							<Comment><![CDATA[ always TRUE in sim]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU9_12.PushRunning</Name>
+							<Comment><![CDATA[ push motor feedback (RunningIn)]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU9_12.PosTop</Name>
+							<Comment><![CDATA[ LTU aligned with orange/top]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU9_12.PosMid</Name>
+							<Comment><![CDATA[ LTU at middle stop]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU9_12.PosBottom</Name>
+							<Comment><![CDATA[ LTU aligned with green/bottom]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimLTU9_12.LightBarrier</Name>
+							<Comment><![CDATA[ TRUE = empty, FALSE = carrier inside]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimPurp9_3_1.Occupied</Name>
+							<Comment><![CDATA[ TRUE when carrier is latched at stopper]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimPurp9_3_2.Occupied</Name>
+							<Comment><![CDATA[ TRUE when carrier is latched at stopper]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimPurp3_9_1.Occupied</Name>
+							<Comment><![CDATA[ TRUE when carrier is latched at stopper]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimPurp3_9_2.Occupied</Name>
+							<Comment><![CDATA[ TRUE when carrier is latched at stopper]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimReader_12.ReaderValue</Name>
+							<Comment><![CDATA[ chosen destination]]></Comment>
+							<Type>INT</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimReader_3.ReaderValue</Name>
+							<Comment><![CDATA[ chosen destination]]></Comment>
+							<Type>INT</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimReader_6.ReaderValue</Name>
+							<Comment><![CDATA[ chosen destination]]></Comment>
+							<Type>INT</Type>
+						</Var>
+						<Var>
+							<Name>PRG_SIM.SimReader_9.ReaderValue</Name>
+							<Comment><![CDATA[ chosen destination]]></Comment>
+							<Type>INT</Type>
+						</Var>
+					</Vars>
+					<Vars VarGrpType="1" ContextId="1" AreaNo="16">
+						<Name>PlcTask Inputs</Name>
+						<Var>
+							<Name>MAIN.Conv12_6.MotorOK</Name>
+							<Comment><![CDATA[ from sensor]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Conv12_6.RunningIn</Name>
+							<Comment><![CDATA[ from sensor]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Conv6_12.MotorOK</Name>
+							<Comment><![CDATA[ from sensor]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Conv6_12.RunningIn</Name>
+							<Comment><![CDATA[ from sensor]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Conv3_9.MotorOK</Name>
+							<Comment><![CDATA[ from sensor]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Conv3_9.RunningIn</Name>
+							<Comment><![CDATA[ from sensor]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Conv9_3.MotorOK</Name>
+							<Comment><![CDATA[ from sensor]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Conv9_3.RunningIn</Name>
+							<Comment><![CDATA[ from sensor]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Blue12.OccupiedIn</Name>
+							<Comment><![CDATA[ Sensor input]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Blue6.OccupiedIn</Name>
+							<Comment><![CDATA[ Sensor input]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Blue3.OccupiedIn</Name>
+							<Comment><![CDATA[ Sensor input]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Blue9.OccupiedIn</Name>
+							<Comment><![CDATA[ Sensor input]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_12_3.MotorOK</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_12_3.RunningIn</Name>
+							<Comment><![CDATA[ motor running feedback]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_12_3.LightBarrierIn</Name>
+							<Comment><![CDATA[ TRUE if LTU free]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_12_3.PosBottomIn</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_12_3.PosMidIn</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_12_3.PosTopIn</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_3_6.MotorOK</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_3_6.RunningIn</Name>
+							<Comment><![CDATA[ motor running feedback]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_3_6.LightBarrierIn</Name>
+							<Comment><![CDATA[ TRUE if LTU free]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_3_6.PosBottomIn</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_3_6.PosMidIn</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_3_6.PosTopIn</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_6_9.MotorOK</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_6_9.RunningIn</Name>
+							<Comment><![CDATA[ motor running feedback]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_6_9.LightBarrierIn</Name>
+							<Comment><![CDATA[ TRUE if LTU free]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_6_9.PosBottomIn</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_6_9.PosMidIn</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_6_9.PosTopIn</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_9_12.MotorOK</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_9_12.RunningIn</Name>
+							<Comment><![CDATA[ motor running feedback]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_9_12.LightBarrierIn</Name>
+							<Comment><![CDATA[ TRUE if LTU free]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_9_12.PosBottomIn</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_9_12.PosMidIn</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_9_12.PosTopIn</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Purple9_3_1.OccupiedIn</Name>
+							<Comment><![CDATA[ Sensor input]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Purple9_3_2.OccupiedIn</Name>
+							<Comment><![CDATA[ Sensor input]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Purple3_9_1.OccupiedIn</Name>
+							<Comment><![CDATA[ Sensor input]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Purple3_9_2.OccupiedIn</Name>
+							<Comment><![CDATA[ Sensor input]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Reader12.I_ReaderValue</Name>
+							<Type>INT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Reader3.I_ReaderValue</Name>
+							<Type>INT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Reader6.I_ReaderValue</Name>
+							<Type>INT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Reader9.I_ReaderValue</Name>
+							<Type>INT</Type>
+						</Var>
+					</Vars>
+					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
+						<Name>PlcTask Outputs</Name>
+						<Var>
+							<Name>MAIN.Conv12_6.MotorRun</Name>
+							<Comment><![CDATA[ Output to motor cmd]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Conv6_12.MotorRun</Name>
+							<Comment><![CDATA[ Output to motor cmd]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Conv3_9.MotorRun</Name>
+							<Comment><![CDATA[ Output to motor cmd]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Conv9_3.MotorRun</Name>
+							<Comment><![CDATA[ Output to motor cmd]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Blue12.StopperDown</Name>
+							<Comment><![CDATA[ Actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Blue6.StopperDown</Name>
+							<Comment><![CDATA[ Actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Blue3.StopperDown</Name>
+							<Comment><![CDATA[ Actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Blue9.StopperDown</Name>
+							<Comment><![CDATA[ Actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_12_3.CylToTop</Name>
+							<Comment><![CDATA[ actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_12_3.CylToBottom</Name>
+							<Comment><![CDATA[ actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_12_3.LTU_MotorRun</Name>
+							<Comment><![CDATA[ actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_3_6.CylToTop</Name>
+							<Comment><![CDATA[ actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_3_6.CylToBottom</Name>
+							<Comment><![CDATA[ actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_3_6.LTU_MotorRun</Name>
+							<Comment><![CDATA[ actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_6_9.CylToTop</Name>
+							<Comment><![CDATA[ actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_6_9.CylToBottom</Name>
+							<Comment><![CDATA[ actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_6_9.LTU_MotorRun</Name>
+							<Comment><![CDATA[ actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_9_12.CylToTop</Name>
+							<Comment><![CDATA[ actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_9_12.CylToBottom</Name>
+							<Comment><![CDATA[ actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.LTU_9_12.LTU_MotorRun</Name>
+							<Comment><![CDATA[ actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Purple9_3_1.StopperDown</Name>
+							<Comment><![CDATA[ Actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Purple9_3_2.StopperDown</Name>
+							<Comment><![CDATA[ Actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Purple3_9_1.StopperDown</Name>
+							<Comment><![CDATA[ Actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Purple3_9_2.StopperDown</Name>
+							<Comment><![CDATA[ Actuator output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Reader12.Valid</Name>
+							<Comment><![CDATA[ TRUE for one scan when a new value is read]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Reader12.vTrigger</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Reader3.Valid</Name>
+							<Comment><![CDATA[ TRUE for one scan when a new value is read]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Reader3.vTrigger</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Reader6.Valid</Name>
+							<Comment><![CDATA[ TRUE for one scan when a new value is read]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Reader6.vTrigger</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Reader9.Valid</Name>
+							<Comment><![CDATA[ TRUE for one scan when a new value is read]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Reader9.vTrigger</Name>
+							<Type>BOOL</Type>
+						</Var>
+					</Vars>
+					<UnrestoredVarLinks ImportTime="2025-09-23T15:43:59">
+						<OwnerA Name="InputDst" Prefix="TIPC^TS_PLC^TS_PLC Instance" Type="1">
+							<OwnerB Name="TIPC^TS_PLC^TS_PLC Instance">
+								<Link VarA="PRG_SIM.O_Blue3_CmdDown" TypeA="BOOL" InOutA="0" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="PlcTask Outputs^GVL_IO.O_Blue3_CmdDown" RestoreInfo="ANotFound"/>
+								<Link VarA="PRG_SIM.O_Conv3_9_MotorRun" TypeA="BOOL" InOutA="0" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="PlcTask Outputs^GVL_IO.O_Conv3_9_MotorRun" RestoreInfo="ANotFound"/>
+								<Link VarA="PRG_SIM.O_LTU3_MotorRun" TypeA="BOOL" InOutA="0" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="PlcTask Outputs^GVL_IO.O_LTU3_MotorRun" RestoreInfo="ANotFound"/>
+							</OwnerB>
+						</OwnerA>
+					</UnrestoredVarLinks>
+					<UnrestoredVarLinks ImportTime="2025-09-23T16:58:22">
+						<OwnerA Name="InputDst" Prefix="TIPC^TS_PLC^TS_PLC Instance" Type="1">
+							<OwnerB Name="TIPC^TS_PLC^TS_PLC Instance">
+								<Link VarA="PRG_SIM.SimLTU12_3.CmdRun" TypeA="BOOL" InOutA="0" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="PlcTask Outputs^MAIN.LTU_12_3.LTU_MotorRun" RestoreInfo="ANotFound"/>
+								<Link VarA="PRG_SIM.SimLTU3_6.CmdRun" TypeA="BOOL" InOutA="0" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="PlcTask Outputs^MAIN.LTU_3_6.LTU_MotorRun" RestoreInfo="ANotFound"/>
+								<Link VarA="PRG_SIM.SimLTU6_9.CmdRun" TypeA="BOOL" InOutA="0" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="PlcTask Outputs^MAIN.LTU_6_9.LTU_MotorRun" RestoreInfo="ANotFound"/>
+								<Link VarA="PRG_SIM.SimLTU9_12.CmdRun" TypeA="BOOL" InOutA="0" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="PlcTask Outputs^MAIN.LTU_9_12.LTU_MotorRun" RestoreInfo="ANotFound"/>
+							</OwnerB>
+						</OwnerA>
+						<OwnerA Name="OutputSrc" Prefix="TIPC^TS_PLC^TS_PLC Instance" Type="2">
+							<OwnerB Name="TIPC^TS_PLC^TS_PLC Instance">
+								<Link VarA="PRG_SIM.SimLTU12_3.RunningIn" TypeA="BOOL" InOutA="1" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="PlcTask Inputs^MAIN.LTU_12_3.RunningIn" RestoreInfo="ANotFound"/>
+								<Link VarA="PRG_SIM.SimLTU3_6.RunningIn" TypeA="BOOL" InOutA="1" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="PlcTask Inputs^MAIN.LTU_3_6.RunningIn" RestoreInfo="ANotFound"/>
+								<Link VarA="PRG_SIM.SimLTU6_9.RunningIn" TypeA="BOOL" InOutA="1" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="PlcTask Inputs^MAIN.LTU_6_9.RunningIn" RestoreInfo="ANotFound"/>
+								<Link VarA="PRG_SIM.SimLTU9_12.RunningIn" TypeA="BOOL" InOutA="1" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="PlcTask Inputs^MAIN.LTU_9_12.RunningIn" RestoreInfo="ANotFound"/>
+							</OwnerB>
+						</OwnerA>
+					</UnrestoredVarLinks>
+					<Contexts>
+						<Context>
+							<Id>0</Id>
+							<Name>SimTask</Name>
+							<ManualConfig>
+								<OTCID>#x02010040</OTCID>
+							</ManualConfig>
+							<Priority>1</Priority>
+							<CycleTime>10000000</CycleTime>
+						</Context>
+						<Context>
+							<Id>1</Id>
+							<Name>PlcTask</Name>
+							<ManualConfig>
+								<OTCID>#x02010030</OTCID>
+							</ManualConfig>
+							<Priority>20</Priority>
+							<CycleTime>10000000</CycleTime>
+						</Context>
+					</Contexts>
+					<TaskPouOids>
+						<TaskPouOid Prio="1" OTCID="#x08502002"/>
+						<TaskPouOid Prio="20" OTCID="#x08502001"/>
+					</TaskPouOids>
+				</Instance>
+			</Project>
+		</Plc>
+		<Io/>
+	</Project>
+	<Mappings>
+		<MappingInfo Identifier="{08502002-2001-0850-0020-500801205008}" Id="#x02030010" Watchdog="04000000040000000400000004000000"/>
+		<OwnerA Name="TIPC^TS_PLC^TS_PLC Instance">
+			<OwnerB Name="TIPC^TS_PLC^TS_PLC Instance">
+				<Link VarA="PlcTask Inputs^MAIN.Conv12_6.MotorOK" VarB="SimTask Outputs^PRG_SIM.SimConv12_6.MotorOK"/>
+				<Link VarA="PlcTask Inputs^MAIN.Conv12_6.RunningIn" VarB="SimTask Outputs^PRG_SIM.SimConv12_6.RunningIn"/>
+				<Link VarA="PlcTask Inputs^MAIN.Conv3_9.MotorOK" VarB="SimTask Outputs^PRG_SIM.SimConv3_9.MotorOK"/>
+				<Link VarA="PlcTask Inputs^MAIN.Conv3_9.RunningIn" VarB="SimTask Outputs^PRG_SIM.SimConv3_9.RunningIn"/>
+				<Link VarA="PlcTask Inputs^MAIN.Conv6_12.MotorOK" VarB="SimTask Outputs^PRG_SIM.SimConv6_12.MotorOK"/>
+				<Link VarA="PlcTask Inputs^MAIN.Conv6_12.RunningIn" VarB="SimTask Outputs^PRG_SIM.SimConv6_12.RunningIn"/>
+				<Link VarA="PlcTask Inputs^MAIN.Conv9_3.MotorOK" VarB="SimTask Outputs^PRG_SIM.SimConv9_3.MotorOK"/>
+				<Link VarA="PlcTask Inputs^MAIN.Conv9_3.RunningIn" VarB="SimTask Outputs^PRG_SIM.SimConv9_3.RunningIn"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_12_3.MotorOK" VarB="SimTask Outputs^PRG_SIM.SimLTU12_3.MotorOK"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_12_3.PosBottomIn" VarB="SimTask Outputs^PRG_SIM.SimLTU12_3.PosBottom"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_12_3.PosMidIn" VarB="SimTask Outputs^PRG_SIM.SimLTU12_3.PosMid"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_12_3.PosTopIn" VarB="SimTask Outputs^PRG_SIM.SimLTU12_3.PosTop"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_12_3.RunningIn" VarB="SimTask Outputs^PRG_SIM.SimLTU12_3.PushRunning"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_3_6.MotorOK" VarB="SimTask Outputs^PRG_SIM.SimLTU3_6.MotorOK"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_3_6.PosBottomIn" VarB="SimTask Outputs^PRG_SIM.SimLTU3_6.PosBottom"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_3_6.PosMidIn" VarB="SimTask Outputs^PRG_SIM.SimLTU3_6.PosMid"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_3_6.PosTopIn" VarB="SimTask Outputs^PRG_SIM.SimLTU3_6.PosTop"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_3_6.RunningIn" VarB="SimTask Outputs^PRG_SIM.SimLTU3_6.PushRunning"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_6_9.MotorOK" VarB="SimTask Outputs^PRG_SIM.SimLTU6_9.MotorOK"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_6_9.PosBottomIn" VarB="SimTask Outputs^PRG_SIM.SimLTU6_9.PosBottom"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_6_9.PosMidIn" VarB="SimTask Outputs^PRG_SIM.SimLTU6_9.PosMid"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_6_9.PosTopIn" VarB="SimTask Outputs^PRG_SIM.SimLTU6_9.PosTop"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_6_9.RunningIn" VarB="SimTask Outputs^PRG_SIM.SimLTU6_9.PushRunning"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_9_12.MotorOK" VarB="SimTask Outputs^PRG_SIM.SimLTU9_12.MotorOK"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_9_12.PosBottomIn" VarB="SimTask Outputs^PRG_SIM.SimLTU9_12.PosBottom"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_9_12.PosMidIn" VarB="SimTask Outputs^PRG_SIM.SimLTU9_12.PosMid"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_9_12.PosTopIn" VarB="SimTask Outputs^PRG_SIM.SimLTU9_12.PosTop"/>
+				<Link VarA="PlcTask Inputs^MAIN.LTU_9_12.RunningIn" VarB="SimTask Outputs^PRG_SIM.SimLTU9_12.PushRunning"/>
+				<Link VarA="PlcTask Inputs^MAIN.Reader12.I_ReaderValue" VarB="SimTask Outputs^PRG_SIM.SimReader_12.ReaderValue"/>
+				<Link VarA="PlcTask Inputs^MAIN.Reader3.I_ReaderValue" VarB="SimTask Outputs^PRG_SIM.SimReader_3.ReaderValue"/>
+				<Link VarA="PlcTask Inputs^MAIN.Reader6.I_ReaderValue" VarB="SimTask Outputs^PRG_SIM.SimReader_6.ReaderValue"/>
+				<Link VarA="PlcTask Inputs^MAIN.Reader9.I_ReaderValue" VarB="SimTask Outputs^PRG_SIM.SimReader_9.ReaderValue"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimBlue12.CarrierIn" VarB="PlcTask Outputs^MAIN.Reader12.Valid"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimBlue12.CmdDown" VarB="PlcTask Outputs^MAIN.Blue12.StopperDown"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimBlue3.CarrierIn" VarB="PlcTask Outputs^MAIN.Reader3.Valid"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimBlue3.CmdDown" VarB="PlcTask Outputs^MAIN.Blue3.StopperDown"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimBlue6.CarrierIn" VarB="PlcTask Outputs^MAIN.Reader6.Valid"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimBlue6.CmdDown" VarB="PlcTask Outputs^MAIN.Blue6.StopperDown"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimBlue9.CarrierIn" VarB="PlcTask Outputs^MAIN.Reader9.Valid"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimBlue9.CmdDown" VarB="PlcTask Outputs^MAIN.Blue9.StopperDown"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimConv12_6.MotorRun" VarB="PlcTask Outputs^MAIN.Conv12_6.MotorRun"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimConv3_9.MotorRun" VarB="PlcTask Outputs^MAIN.Conv3_9.MotorRun"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimConv6_12.MotorRun" VarB="PlcTask Outputs^MAIN.Conv6_12.MotorRun"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimConv9_3.MotorRun" VarB="PlcTask Outputs^MAIN.Conv9_3.MotorRun"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimLTU12_3.CmdPush" VarB="PlcTask Outputs^MAIN.LTU_12_3.LTU_MotorRun"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimLTU12_3.MoveDown" VarB="PlcTask Outputs^MAIN.LTU_12_3.CylToBottom"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimLTU12_3.MoveUp" VarB="PlcTask Outputs^MAIN.LTU_12_3.CylToTop"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimLTU3_6.CmdPush" VarB="PlcTask Outputs^MAIN.LTU_3_6.LTU_MotorRun"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimLTU3_6.MoveDown" VarB="PlcTask Outputs^MAIN.LTU_3_6.CylToBottom"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimLTU3_6.MoveUp" VarB="PlcTask Outputs^MAIN.LTU_3_6.CylToTop"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimLTU6_9.CmdPush" VarB="PlcTask Outputs^MAIN.LTU_6_9.LTU_MotorRun"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimLTU6_9.MoveDown" VarB="PlcTask Outputs^MAIN.LTU_6_9.CylToBottom"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimLTU6_9.MoveUp" VarB="PlcTask Outputs^MAIN.LTU_6_9.CylToTop"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimLTU9_12.CmdPush" VarB="PlcTask Outputs^MAIN.LTU_9_12.LTU_MotorRun"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimLTU9_12.MoveDown" VarB="PlcTask Outputs^MAIN.LTU_9_12.CylToBottom"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimLTU9_12.MoveUp" VarB="PlcTask Outputs^MAIN.LTU_9_12.CylToTop"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimPurp3_9_1.CmdDown" VarB="PlcTask Outputs^MAIN.Purple3_9_1.StopperDown"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimPurp3_9_2.CmdDown" VarB="PlcTask Outputs^MAIN.Purple3_9_2.StopperDown"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimPurp9_3_1.CmdDown" VarB="PlcTask Outputs^MAIN.Purple9_3_1.StopperDown"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimPurp9_3_2.CmdDown" VarB="PlcTask Outputs^MAIN.Purple9_3_2.StopperDown"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimReader_12.TriggerRead" VarB="PlcTask Outputs^MAIN.Reader12.vTrigger"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimReader_3.TriggerRead" VarB="PlcTask Outputs^MAIN.Reader3.vTrigger"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimReader_6.TriggerRead" VarB="PlcTask Outputs^MAIN.Reader6.vTrigger"/>
+				<Link VarA="SimTask Inputs^PRG_SIM.SimReader_9.TriggerRead" VarB="PlcTask Outputs^MAIN.Reader9.vTrigger"/>
+			</OwnerB>
+		</OwnerA>
+	</Mappings>
+</TcSmProject>

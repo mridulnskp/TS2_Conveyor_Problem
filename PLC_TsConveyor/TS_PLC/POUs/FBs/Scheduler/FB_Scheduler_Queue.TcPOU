@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Scheduler_Queue" Id="{be6887c1-7071-4214-80b4-a2ce4ff75aae}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Scheduler_Queue
+VAR_INPUT
+    // Reader inputs
+    Reader12_Valid : BOOL;
+    Reader12_Value : INT;
+    Reader3_Valid  : BOOL;
+    Reader3_Value  : INT;
+    Reader6_Valid  : BOOL;
+    Reader6_Value  : INT;
+    Reader9_Valid  : BOOL;
+    Reader9_Value  : INT;
+
+    // Done flags from transfers
+    T12_6_Done, T6_12_Done : BOOL;
+    T9_3_Done,  T3_9_Done  : BOOL;
+    T12_3_Done, T6_9_Done  : BOOL;
+    T3_6_Done,  T9_12_Done : BOOL;
+    T12_9_Done, T6_3_Done  : BOOL;
+    T9_6_Done,  T3_12_Done : BOOL;
+
+    Reset : BOOL;
+END_VAR
+VAR_OUTPUT
+    // Start signals (1-scan pulses)
+    Start_12_6, Start_6_12 : BOOL;
+    Start_9_3,  Start_3_9  : BOOL;
+    Start_12_3, Start_6_9  : BOOL;
+    Start_3_6,  Start_9_12 : BOOL;
+    Start_12_9, Start_6_3  : BOOL;
+    Start_9_6,  Start_3_12 : BOOL;
+
+    Busy        : BOOL;
+    QCount      : INT;     // number of queued requests
+    activeRoute : INT;     // currently executing route
+END_VAR
+VAR
+    queue   : ARRAY[1..10] OF INT;   // FIFO buffer (10 deep)
+    head    : INT := 1;
+    tail    : INT := 1;
+	prevR12, prevR3, prevR6, prevR9 : BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// === Reset ===
+IF Reset THEN
+    head := 1; tail := 1; QCount := 0;
+    Busy := FALSE; activeRoute := 0;
+END_IF
+
+// === Enqueue new reader requests ===
+IF Reader12_Valid AND NOT prevR12 THEN
+    CASE Reader12_Value OF
+        6: Enqueue(126);
+        3: Enqueue(123);
+        9: Enqueue(129);
+    END_CASE
+END_IF
+prevR12 := Reader12_Valid;
+
+IF Reader6_Valid AND NOT prevR6 THEN
+    CASE Reader6_Value OF
+        12: Enqueue(612);
+        9:  Enqueue(69);
+        3:  Enqueue(63);
+    END_CASE
+END_IF
+prevR6 := Reader6_Valid;
+
+IF Reader3_Valid AND NOT prevR3 THEN
+    CASE Reader3_Value OF
+        9:  Enqueue(39);
+        6:  Enqueue(36);
+        12: Enqueue(312);
+    END_CASE
+END_IF
+prevR3 := Reader3_Valid;
+
+IF Reader9_Valid AND NOT prevR9 THEN
+    CASE Reader9_Value OF
+        3:  Enqueue(93);
+        12: Enqueue(912);
+        6:  Enqueue(96);
+    END_CASE
+END_IF
+prevR9 := Reader9_Valid;
+
+
+// === Dispatch logic ===
+IF NOT Busy AND QCount > 0 THEN
+    activeRoute := queue[head];
+    head := (head MOD 10) + 1;
+    QCount := QCount - 1;
+    Busy := TRUE;
+
+    // one-shot Start signal
+    CASE activeRoute OF
+        126: Start_12_6 := TRUE;
+        612: Start_6_12 := TRUE;
+        93 : Start_9_3  := TRUE;
+        39 : Start_3_9  := TRUE;
+        123: Start_12_3 := TRUE;
+        69 : Start_6_9  := TRUE;
+        36 : Start_3_6  := TRUE;
+        912: Start_9_12 := TRUE;
+        129: Start_12_9 := TRUE;
+        63 : Start_6_3  := TRUE;
+        96 : Start_9_6  := TRUE;
+        312: Start_3_12 := TRUE;
+    END_CASE
+ELSE
+    Start_12_6 := FALSE; Start_6_12 := FALSE;
+    Start_9_3  := FALSE; Start_3_9  := FALSE;
+    Start_12_3 := FALSE; Start_6_9  := FALSE;
+    Start_3_6  := FALSE; Start_9_12 := FALSE;
+    Start_12_9 := FALSE; Start_6_3  := FALSE;
+    Start_9_6  := FALSE; Start_3_12 := FALSE;
+END_IF
+
+
+// === Completion check ===
+CASE activeRoute OF
+    126: IF T12_6_Done THEN Busy := FALSE; activeRoute := 0; END_IF
+    612: IF T6_12_Done THEN Busy := FALSE; activeRoute := 0; END_IF
+    93 : IF T9_3_Done  THEN Busy := FALSE; activeRoute := 0; END_IF
+    39 : IF T3_9_Done  THEN Busy := FALSE; activeRoute := 0; END_IF
+    123: IF T12_3_Done THEN Busy := FALSE; activeRoute := 0; END_IF
+    69 : IF T6_9_Done  THEN Busy := FALSE; activeRoute := 0; END_IF
+    36 : IF T3_6_Done  THEN Busy := FALSE; activeRoute := 0; END_IF
+    912: IF T9_12_Done THEN Busy := FALSE; activeRoute := 0; END_IF
+    129: IF T12_9_Done THEN Busy := FALSE; activeRoute := 0; END_IF
+    63 : IF T6_3_Done  THEN Busy := FALSE; activeRoute := 0; END_IF
+    96 : IF T9_6_Done  THEN Busy := FALSE; activeRoute := 0; END_IF
+    312: IF T3_12_Done THEN Busy := FALSE; activeRoute := 0; END_IF
+END_CASE]]></ST>
+    </Implementation>
+    <Method Name="Enqueue" Id="{b03f031f-cd66-4fc3-819d-b28af9a4d9f2}">
+      <Declaration><![CDATA[METHOD PRIVATE Enqueue : BOOL
+VAR_INPUT
+    route : INT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+IF QCount < 10 THEN
+    queue[tail] := route;
+    tail := (tail MOD 10) + 1;
+    QCount := QCount + 1;
+    Enqueue := TRUE;
+ELSE
+    Enqueue := FALSE; // queue full
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Scheduler_Queue">
+      <LineId Id="48" Count="14" />
+      <LineId Id="135" Count="0" />
+      <LineId Id="63" Count="6" />
+      <LineId Id="136" Count="0" />
+      <LineId Id="70" Count="7" />
+      <LineId Id="137" Count="0" />
+      <LineId Id="78" Count="7" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="86" Count="47" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Scheduler_Queue.Enqueue">
+      <LineId Id="8" Count="7" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

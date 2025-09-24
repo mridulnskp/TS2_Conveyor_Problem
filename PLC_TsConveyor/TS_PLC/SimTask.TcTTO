@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <Task Name="SimTask" Id="{4459df0f-4152-4ccf-802d-f93d87f45586}">
+    <!--CycleTime in micro seconds.-->
+    <CycleTime>10000</CycleTime>
+    <Priority>1</Priority>
+    <PouCall>
+      <Name>PRG_SIM</Name>
+    </PouCall>
+    <TaskFBGuid>{6e27e6e6-d3ed-4382-af30-cab59ac9482b}</TaskFBGuid>
+    <Fb_init>{7aa8f4b3-c1c0-4182-b40e-0b930d0c9690}</Fb_init>
+    <Fb_exit>{5388ecc0-a9db-4191-8cbe-18481c4ddadc}</Fb_exit>
+    <CycleUpdate>{3569f414-fb87-48bf-a58c-a80d8be5ea60}</CycleUpdate>
+    <PostCycleUpdate>{2d50b477-c198-40fd-ba8b-88ff1eaae78d}</PostCycleUpdate>
+  </Task>
+</TcPlcObject>

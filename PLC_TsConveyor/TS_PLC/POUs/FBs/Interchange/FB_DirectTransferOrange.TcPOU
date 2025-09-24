@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_DirectTransferOrange" Id="{b3591939-62fb-44d5-b309-a2b5d7e7c8f7}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_DirectTransferOrange
+VAR_INPUT
+    StartRequest : BOOL;   // reader detected correct dest
+    LTU1_PosOK   : BOOL;   // LTU1 at Top
+    LTU1_Running : BOOL;
+    LTU1_LB      : BOOL;
+    LTU2_PosOK   : BOOL;   // LTU2 at Top
+    LTU2_Running : BOOL;
+    LTU2_LB      : BOOL;
+    BlueOcc      : BOOL;   // entry stopper occupied
+    Purple1Occ   : BOOL;   // intermediate purple (near LTU1)
+    Purple2Occ   : BOOL;   // final purple (exit stopper)
+    reset        : BOOL;
+END_VAR
+VAR_OUTPUT
+    BlueCmdDown    : BOOL;
+    Purple1CmdDown : BOOL;
+    Purple2CmdDown : BOOL;
+    LTU1_MoveUp    : BOOL;
+    LTU2_MoveUp    : BOOL;
+	LTU1_MotorRunCmd : BOOL; // True=bottom
+	LTU2_MotorRunCmd : BOOL;
+    Done           : BOOL;
+    Error          : BOOL;
+END_VAR
+VAR
+    state : INT := 0;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE state OF
+0: // IDLE
+    BlueCmdDown    := TRUE;//blocking
+    Purple1CmdDown := FALSE;//release
+    Purple2CmdDown := FALSE;//release
+    Done := FALSE; Error := FALSE;
+
+    IF StartRequest THEN
+        LTU1_MoveUp := TRUE;
+        LTU2_MoveUp := TRUE;
+        state := 1;
+    END_IF
+
+1: // ALIGN
+    LTU1_MoveUp := TRUE;
+    LTU2_MoveUp := TRUE;
+
+    IF LTU1_PosOK AND 
+        LTU2_PosOK  THEN
+        
+        state := 2;
+    END_IF
+
+2: // CHECK_PURPLES
+    IF (NOT Purple1CmdDown) AND (NOT Purple2CmdDown) THEN
+        state := 3;
+    END_IF
+
+3: // RELEASE
+    IF BlueOcc THEN
+        BlueCmdDown := FALSE;
+        state := 4;
+    END_IF
+
+4: // WAIT_ENTER_LT1
+    IF NOT BlueOcc THEN
+        BlueCmdDown := TRUE; // re-block entry
+    END_IF
+	
+    IF NOT LTU1_LB THEN
+        state := 5;
+    END_IF
+
+5: // WAIT_LEAVE_LT1
+	BlueCmdDown := TRUE;//reblock 
+	LTU1_MotorRunCmd := TRUE;
+	LTU2_MotorRunCmd := TRUE;
+    IF LTU1_LB THEN
+        state := 6;
+    END_IF
+
+6: // WAIT_ENTER_LT2
+    IF NOT LTU2_LB THEN
+        state := 7;
+    END_IF
+
+7: // WAIT_LEAVE_LT2
+    IF LTU2_LB THEN
+        state := 8;
+    END_IF
+
+8: // WAIT_AT_PURPLE
+    IF Purple2Occ THEN
+        Purple2CmdDown := FALSE; // release final carrier
+        Done := TRUE;
+        state := 0;
+    END_IF
+
+99: // ERROR
+    BlueCmdDown    := TRUE;
+    Purple1CmdDown := TRUE;
+    Purple2CmdDown := TRUE;
+    Error := TRUE;
+    IF reset THEN
+        state := 0;
+    END_IF
+END_CASE]]></ST>
+    </Implementation>
+    <LineIds Name="FB_DirectTransferOrange">
+      <LineId Id="106" Count="19" />
+      <LineId Id="127" Count="17" />
+      <LineId Id="203" Count="0" />
+      <LineId Id="145" Count="4" />
+      <LineId Id="211" Count="0" />
+      <LineId Id="210" Count="0" />
+      <LineId Id="209" Count="0" />
+      <LineId Id="150" Count="28" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

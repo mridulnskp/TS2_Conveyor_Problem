@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Reader" Id="{ed5ec36d-3732-4df6-9cc5-3d999419aa2d}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Reader
+VAR_INPUT
+    TriggerRead : BOOL;   // input from I_ReaderXX_Trigger
+	BlueOcc : BOOL;
+	Dest : Int;
+END_VAR
+VAR_OUTPUT
+    ReaderValue : INT;    // destination code (12, 3, 6, 9)
+    Valid       AT%Q*: BOOL;   // TRUE for one scan when a new value is read
+END_VAR
+VAR
+    lastTrigger : BOOL;
+	I_ReaderValue AT%I*:INT;
+	vTrigger at%Q*: bool;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+// detect rising edge
+IF TriggerRead AND NOT lastTrigger THEN
+    Valid := TRUE;           // one-cycle pulse
+    ReaderValue := Dest;     // assign destination
+ELSE
+    Valid := FALSE;
+    ReaderValue := 0;
+END_IF
+
+// update memory
+lastTrigger := TriggerRead;
+
+
+
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_Reader">
+      <LineId Id="102" Count="11" />
+      <LineId Id="79" Count="2" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_InjectAfterRelease" Id="{dc8e6cf0-dd0e-4eb8-b1f8-9c9a45f4073f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_InjectAfterRelease
+VAR_INPUT
+    ReleaseTrig : BOOL;    // e.g. Blue stop occupied -> free
+    PT_Travel   : TIME;    // travel time
+END_VAR
+VAR_OUTPUT
+    CarrierIn   : BOOL;    // pulse
+END_VAR
+VAR
+    tTravel   : TON;
+    prevTrig  : BOOL;
+    travelDone: BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Detect falling edge of ReleaseTrig
+IF ReleaseTrig AND NOT prevTrig THEN
+    tTravel(IN := TRUE, PT := PT_Travel);
+    travelDone := FALSE;
+END_IF
+
+// Timer completes → latch CarrierIn
+IF tTravel.Q THEN
+    CarrierIn := TRUE;
+    travelDone := TRUE;
+    tTravel(IN := FALSE);
+END_IF
+
+// Once LTU consumes the carrier, its SimLTU will reset CarrierIn → FALSE
+IF NOT travelDone THEN
+    CarrierIn := FALSE;
+END_IF
+
+// Save trigger state
+prevTrig := ReleaseTrig;
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_InjectAfterRelease">
+      <LineId Id="58" Count="18" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="36" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

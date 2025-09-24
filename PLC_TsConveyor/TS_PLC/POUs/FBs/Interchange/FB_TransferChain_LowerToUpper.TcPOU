@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_TransferChain_LowerToUpper" Id="{52a8bd27-2b6b-45ac-adb2-2171b9c25723}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_TransferChain_LowerToUpper
+VAR_INPUT
+    StartRequest : BOOL;
+    reset        : BOOL;
+
+    // Blue12
+    BlueOcc      : BOOL;
+
+    // LTU_12_3
+    LTU1_PosBottom, LTU1_PosTop, LTU1_Running, LTU1_LB : BOOL;
+
+    // LTU_3_6
+    LTU2_PosBottom, LTU2_PosTop, LTU2_Running, LTU2_LB : BOOL;
+
+    // LTU_6_9
+    LTU3_PosBottom, LTU3_PosTop, LTU3_Running, LTU3_LB : BOOL;
+
+    // Purple stoppers
+    Purple1_Occ : BOOL;   // Purple9_3_2
+    Purple2_Occ : BOOL;   // Purple3_9_1
+    Purple3_Occ : BOOL;   // Purple3_9_2
+END_VAR
+VAR_OUTPUT
+    // Blue
+    BlueCmdDown : BOOL;
+
+    // Purple
+    Purple1CmdDown, Purple2CmdDown, Purple3CmdDown : BOOL;
+
+    // LTU_12_3
+    LTU1_CmdPush, LTU1_MoveUp, LTU1_MoveDown : BOOL;
+
+    // LTU_3_6
+    LTU2_CmdPush, LTU2_MoveUp, LTU2_MoveDown : BOOL;
+
+    // LTU_6_9
+    LTU3_CmdPush, LTU3_MoveUp, LTU3_MoveDown : BOOL;
+
+    Done  : BOOL;
+    Error : BOOL;
+END_VAR
+VAR
+    state       : INT := 0;
+    lastRequest : BOOL := FALSE;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE state OF
+0: // IDLE
+    BlueCmdDown     := TRUE;
+    Purple1CmdDown  := TRUE;
+    Purple2CmdDown  := TRUE;
+    Purple3CmdDown  := TRUE;
+	LTU1_MoveDown := FALSE;
+	LTU1_MoveUp := FALSE;
+	LTU2_MoveDown := FALSE;
+	LTU2_MoveUp := FALSE;
+	LTU3_MoveDown := FALSE;
+	LTU3_MoveUp := FALSE;
+	
+	
+    LTU1_CmdPush := FALSE;
+    LTU2_CmdPush := FALSE;
+    LTU3_CmdPush := FALSE;
+
+    Error := FALSE;
+
+    IF StartRequest AND NOT lastRequest THEN
+        Done := FALSE;
+        state := 1;
+    END_IF
+
+1: // ALIGN
+    LTU1_MoveDown := TRUE;   // LTU_12_3 to Bottom
+    LTU2_MoveDown := TRUE;   // LTU_3_6 to Bottom
+    LTU3_MoveUp   := TRUE;   // LTU_6_9 to Top
+
+    IF LTU1_PosBottom AND NOT LTU1_Running
+       AND LTU2_PosBottom AND NOT LTU2_Running
+       AND LTU3_PosTop AND NOT LTU3_Running THEN
+        state := 2;
+    END_IF
+
+2: // CHECK_PURPLES
+    IF Purple1CmdDown AND Purple2CmdDown AND Purple3CmdDown THEN
+        state := 3;
+    END_IF
+
+3: // RELEASE BLUE
+    IF BlueOcc THEN
+        BlueCmdDown := FALSE;
+        state := 4;
+    END_IF
+
+4: // LTU_12_3 cycle (straight push to LTU_3_6)
+    IF NOT BlueOcc THEN 
+		BlueCmdDown := TRUE; //reblocking after release
+	END_IF
+
+    IF NOT LTU1_LB AND NOT LTU2_Running THEN //carrier reached LTU1 and LTU2 is not running
+        LTU1_CmdPush := TRUE;
+    END_IF
+
+    IF LTU1_LB THEN
+        LTU1_CmdPush := FALSE;
+        state := 5;
+    END_IF
+
+5: // LTU_3_6 cycle (Lift Up + Push to Purple3_9_1)
+	BlueCmdDown := TRUE; //reblocking after release
+    IF NOT LTU2_LB THEN //carrier reached LTU2
+        LTU2_MoveUp := TRUE;
+		LTU2_MoveDown := FALSE;
+        IF LTU2_PosTop AND NOT LTU3_Running THEN
+            //LTU2_MoveUp := FALSE;
+            LTU2_CmdPush := TRUE;
+            IF Purple2_Occ THEN
+                //LTU2_CmdPush := FALSE;
+                state := 6;
+            END_IF
+        END_IF
+    END_IF
+
+6: // RELEASE Purple3_9_1
+    Purple2CmdDown := FALSE;
+	IF NOT Purple2_Occ THEN
+		LTU2_CmdPush := FALSE;
+		state := 7;
+	END_IF
+    
+
+7: // LTU_6_9 cycle (Bottom->Top->Push to Purple9_3_2)
+    IF NOT LTU3_LB THEN// carrier is reached LTU3
+        LTU3_MoveUp := TRUE;
+		LTU3_MoveDown := FALSE;
+        IF LTU3_PosTop  THEN
+            //LTU3_MoveUp := FALSE;
+            LTU3_CmdPush := TRUE;
+            IF Purple3_Occ THEN
+                //LTU3_CmdPush := FALSE;
+                state := 8;
+            END_IF
+        END_IF
+    END_IF
+
+8: // COMPLETE
+    Purple3CmdDown := FALSE;
+	IF NOT Purple3_Occ THEN
+		LTU3_CmdPush := FALSE;
+		Done := TRUE;
+    	state := 0;
+	END_IF
+ 
+
+99: // ERROR
+    BlueCmdDown     := TRUE;
+    Purple1CmdDown  := TRUE;
+    Purple2CmdDown  := TRUE;
+    Purple3CmdDown  := TRUE;
+    LTU1_CmdPush := FALSE;
+    LTU2_CmdPush := FALSE;
+    LTU3_CmdPush := FALSE;
+    Error := TRUE;
+    IF reset THEN state := 0; END_IF
+END_CASE
+
+// latch new request
+lastRequest := StartRequest;]]></ST>
+    </Implementation>
+    <LineIds Name="FB_TransferChain_LowerToUpper">
+      <LineId Id="53" Count="6" />
+      <LineId Id="169" Count="6" />
+      <LineId Id="60" Count="18" />
+      <LineId Id="82" Count="15" />
+      <LineId Id="156" Count="1" />
+      <LineId Id="98" Count="10" />
+      <LineId Id="176" Count="0" />
+      <LineId Id="109" Count="1" />
+      <LineId Id="167" Count="0" />
+      <LineId Id="111" Count="11" />
+      <LineId Id="158" Count="1" />
+      <LineId Id="161" Count="0" />
+      <LineId Id="160" Count="0" />
+      <LineId Id="123" Count="4" />
+      <LineId Id="168" Count="0" />
+      <LineId Id="128" Count="11" />
+      <LineId Id="163" Count="3" />
+      <LineId Id="162" Count="0" />
+      <LineId Id="140" Count="0" />
+      <LineId Id="142" Count="13" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

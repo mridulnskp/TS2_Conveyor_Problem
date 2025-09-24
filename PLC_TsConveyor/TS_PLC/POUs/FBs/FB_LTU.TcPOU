@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_LTU" Id="{072c9ed7-12a5-41dc-ae7a-0f19575d928a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_LTU
+VAR_INPUT
+    CmdMoveUp      : BOOL;   // request cylinder to Top
+    CmdMoveDown    : BOOL;   // request cylinder to Bottom
+    CmdRun         : BOOL;   // run LTU motor
+    MotorOK        AT%I*: BOOL;
+    RunningIn      AT%I*: BOOL;   // motor running feedback
+    LightBarrierIn AT%I*: BOOL;   // TRUE if LTU free
+    PosBottomIn    AT%I*: BOOL;
+    PosMidIn       AT%I*: BOOL;
+    PosTopIn       AT%I*: BOOL;
+END_VAR
+VAR_OUTPUT
+    CylToTop       AT%Q*: BOOL;   // actuator output
+    CylToBottom    AT%Q*: BOOL;   // actuator output
+    LTU_MotorRun   AT%Q*: BOOL;   // actuator output
+    IsRunning      : BOOL;   // motor running feedback
+    PosBottom      : BOOL;
+    PosMid         : BOOL;
+    PosTop         : BOOL;
+    IsFree         : BOOL;   // derived from LightBarrierIn
+END_VAR
+VAR
+    Motor : FB_MotorUnit;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Cylinder logic (safe mutual exclusion)
+CylToTop    := CmdMoveUp AND NOT CmdMoveDown;
+CylToBottom := CmdMoveDown AND NOT CmdMoveUp;
+
+// Motor logic
+Motor(CmdRun := CmdRun,
+      MotorOK := MotorOK,
+      RunningIn := RunningIn);
+
+LTU_MotorRun := Motor.MotorRun;
+IsRunning    := Motor.IsRunning;
+
+// Pass-through sensors
+PosBottom := PosBottomIn;
+PosMid    := PosMidIn;
+PosTop    := PosTopIn;
+IsFree    := LightBarrierIn;]]></ST>
+    </Implementation>
+    <LineIds Name="FB_LTU">
+      <LineId Id="33" Count="15" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

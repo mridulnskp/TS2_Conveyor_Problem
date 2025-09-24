@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_TransferCorner_UpperToLower" Id="{b01b2d74-92f0-45a0-a814-3c15d1517a16}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_TransferCorner_UpperToLower
+VAR_INPUT
+    StartRequest : BOOL;   // request to start
+    LTU_PosTop   : BOOL;
+    LTU_PosBottom: BOOL;
+    LTU_Running  : BOOL;
+    LTU_LB       : BOOL;   // TRUE=empty, FALSE=occupied
+    BlueOcc      : BOOL;   // Blue entry occupied
+    PurpleOcc    : BOOL;   // entry purple occupied (must be released)
+    reset        : BOOL;
+END_VAR
+VAR_OUTPUT
+    BlueCmdDown   : BOOL;
+    PurpleCmdDown : BOOL;
+    LTU_MoveUp    : BOOL;
+    LTU_MoveDown  : BOOL;
+    LTU_CmdPush   : BOOL;
+    Done          : BOOL;
+    Error         : BOOL;
+END_VAR
+VAR
+    state : INT := 0;
+	lastRequest: BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE state OF
+0: // IDLE
+    BlueCmdDown   := TRUE;
+    PurpleCmdDown := TRUE;   // block by default
+    LTU_MoveUp    := TRUE;   // keep aligned to Top
+    LTU_MoveDown  := FALSE;
+    LTU_CmdPush   := FALSE;
+    Error := FALSE;
+
+    // latch Done until new request comes
+    IF StartRequest AND NOT lastRequest THEN
+        Done := FALSE;        // reset Done on new request
+        state := 1;           // start cycle
+    END_IF
+
+1: // ALIGN TOP
+    LTU_MoveUp := TRUE;
+    IF LTU_PosTop AND NOT LTU_Running THEN
+        LTU_MoveUp := FALSE;
+        state := 2;
+    END_IF
+
+2: // RELEASE
+    IF BlueOcc AND PurpleCmdDown THEN
+        BlueCmdDown := FALSE;  // let carrier into LTU
+        state := 3;
+    END_IF
+
+3: // WAIT_ENTER_LT
+    IF NOT BlueOcc THEN
+        BlueCmdDown := TRUE;   // re-block entry
+    END_IF
+    IF NOT LTU_LB THEN
+        state := 4;
+    END_IF
+
+4: // LIFT DOWN
+	BlueCmdDown := TRUE;//reblock 
+    LTU_MoveDown := TRUE;
+    IF LTU_PosBottom AND NOT LTU_Running THEN
+        LTU_MoveDown := FALSE;
+        state := 5;
+    END_IF
+
+5: // PUSH OUT
+    LTU_CmdPush := TRUE;
+    IF LTU_LB THEN  // became empty again
+        LTU_CmdPush := FALSE;
+        Done := TRUE;         // latch Done
+        state := 0;           // go back to IDLE
+    END_IF
+
+99: // ERROR
+    BlueCmdDown   := TRUE;
+    PurpleCmdDown := TRUE;
+    LTU_MoveUp    := FALSE;
+    LTU_MoveDown  := FALSE;
+    LTU_CmdPush   := FALSE;
+    Error := TRUE;
+    IF reset THEN
+        state := 0;
+    END_IF
+END_CASE
+
+// --- Edge detection for StartRequest ---
+lastRequest := StartRequest;]]></ST>
+    </Implementation>
+    <LineIds Name="FB_TransferCorner_UpperToLower">
+      <LineId Id="112" Count="36" />
+      <LineId Id="177" Count="0" />
+      <LineId Id="149" Count="26" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_TransferCorner_LowerToUpper" Id="{f0c441d5-e0ef-4fad-8aa6-7d62cebc1493}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_TransferCorner_LowerToUpper
+VAR_INPUT
+    StartRequest : BOOL;   // reader request
+    LTU_PosTop   : BOOL;
+    LTU_PosBottom: BOOL;
+    LTU_Running  : BOOL;   // push motor feedback
+    LTU_LB       : BOOL;   // TRUE = empty, FALSE = carrier inside
+    BlueOcc      : BOOL;
+    PurpleOcc    : BOOL;
+    reset        : BOOL;
+END_VAR
+VAR_OUTPUT
+    BlueCmdDown   : BOOL;
+    PurpleCmdDown : BOOL;
+    LTU_MoveUp    : BOOL;
+    LTU_MoveDown  : BOOL;
+    LTU_CmdPush   : BOOL;
+    Done          : BOOL;
+    Error         : BOOL;
+END_VAR
+VAR
+    state : INT := 0;
+	lastRequest: BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE state OF
+0: // IDLE
+    BlueCmdDown   := TRUE;
+    PurpleCmdDown := TRUE;
+    LTU_MoveUp    := FALSE;
+    LTU_MoveDown  := TRUE;   // stay aligned to Bottom by default
+    LTU_CmdPush   := FALSE;
+    Error := FALSE;
+
+    // latch Done until a new StartRequest arrives
+    IF StartRequest AND NOT lastRequest THEN
+        Done := FALSE;           // clear done on new request
+        state := 1;              // start new transfer
+    END_IF
+
+1: // RELEASE BLUE
+    IF BlueOcc AND LTU_PosBottom THEN
+        BlueCmdDown := FALSE;   // let carrier enter LTU
+        state := 2;
+    END_IF
+
+2: // WAIT ENTER LTU
+    IF NOT BlueOcc THEN
+        BlueCmdDown := TRUE;    // re-block entry
+    END_IF
+    IF NOT LTU_LB THEN          // LTU occupied
+        state := 3;
+    END_IF
+
+3: // LIFT TO TOP
+	BlueCmdDown := TRUE;
+    LTU_MoveDown := FALSE;
+    LTU_MoveUp   := TRUE;
+
+    IF LTU_PosTop THEN
+        LTU_MoveUp := FALSE;
+        state := 4;
+    END_IF
+
+4: // PUSH OUT
+    IF PurpleOcc THEN
+        PurpleCmdDown := FALSE;
+    END_IF
+     
+    IF NOT PurpleCmdDown THEN   // only push if exit released
+        LTU_CmdPush := TRUE;
+        IF PurpleOcc THEN
+            LTU_CmdPush := FALSE;
+            Done := TRUE;      // latch Done here
+            state := 0;        // return to IDLE, but Done stays TRUE
+        END_IF
+    END_IF
+
+99: // ERROR
+    BlueCmdDown   := TRUE;
+    PurpleCmdDown := TRUE;
+    LTU_MoveUp    := FALSE;
+    LTU_MoveDown  := FALSE;
+    LTU_CmdPush   := FALSE;
+    Error := TRUE;
+    IF reset THEN
+        state := 0;
+    END_IF
+END_CASE
+
+// Rising edge detector for StartRequest
+lastRequest := StartRequest;
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_TransferCorner_LowerToUpper">
+      <LineId Id="127" Count="29" />
+      <LineId Id="193" Count="0" />
+      <LineId Id="157" Count="35" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

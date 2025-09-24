@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_TransferChain_UpperToLower" Id="{6c6e40d4-5704-4ee9-8b48-25459355623b}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_TransferChain_UpperToLower
+VAR_INPUT
+    StartRequest : BOOL;
+    reset        : BOOL;
+
+    // Blue9
+    BlueOcc      : BOOL;
+
+    // LTU_9_12
+    LTU1_PosBottom, LTU1_PosTop, LTU1_Running, LTU1_LB : BOOL;
+
+    // LTU_12_3
+    LTU2_PosBottom, LTU2_PosTop, LTU2_Running, LTU2_LB : BOOL;
+
+    // LTU_3_6
+    LTU3_PosBottom, LTU3_PosTop, LTU3_Running, LTU3_LB : BOOL;
+
+    // Purple stoppers
+    Purple1_Occ : BOOL;   // Purple9_3_1
+    Purple2_Occ : BOOL;   // Purple9_3_2
+	Purple3_Occ : BOOL;   // Purple3_9_1
+END_VAR
+VAR_OUTPUT
+    BlueCmdDown : BOOL;
+
+    Purple1CmdDown, Purple2CmdDown, Purple3CmdDown : BOOL;
+
+    // LTU_9_12
+    LTU1_CmdPush, LTU1_MoveUp, LTU1_MoveDown : BOOL;
+
+    // LTU_12_3
+    LTU2_CmdPush, LTU2_MoveUp, LTU2_MoveDown : BOOL;
+
+    // LTU_3_6
+    LTU3_CmdPush, LTU3_MoveUp, LTU3_MoveDown : BOOL;
+
+    Done  : BOOL;
+    Error : BOOL;
+END_VAR
+VAR
+    state       : INT := 0;
+    lastRequest : BOOL := FALSE;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE state OF
+0: // IDLE
+    BlueCmdDown     := TRUE;
+    Purple1CmdDown  := TRUE;
+    Purple2CmdDown  := TRUE;
+
+    LTU1_CmdPush := FALSE;
+    LTU2_CmdPush := FALSE;
+    LTU3_CmdPush := FALSE;
+
+    LTU1_MoveUp := FALSE; LTU1_MoveDown := FALSE;
+    LTU2_MoveUp := FALSE; LTU2_MoveDown := FALSE;
+    LTU3_MoveUp := FALSE; LTU3_MoveDown := FALSE;
+
+    Error := FALSE;
+
+    IF StartRequest AND NOT lastRequest THEN
+        Done := FALSE;
+        state := 1;
+    END_IF
+
+1: // ALIGN
+    LTU1_MoveUp   := TRUE;   // LTU_9_12 to Top
+    LTU2_MoveUp   := TRUE;   // LTU_12_3 to Top
+    LTU3_MoveDown := TRUE;   // LTU_3_6 to Bottom
+
+    IF LTU1_PosTop AND NOT LTU1_Running
+       AND LTU2_PosTop AND NOT LTU2_Running
+       AND LTU3_PosBottom AND NOT LTU3_Running THEN
+        LTU1_MoveUp   := FALSE;
+        LTU2_MoveUp   := FALSE;
+        LTU3_MoveDown := FALSE;
+        state := 2;
+    END_IF
+
+2: // CHECK_PURPLES
+    IF Purple1CmdDown AND Purple2CmdDown THEN
+        state := 3;
+    END_IF
+
+3: // RELEASE BLUE9
+    IF BlueOcc THEN
+        BlueCmdDown := FALSE;
+        state := 4;
+    END_IF
+
+4: // LTU_9_12 push
+    IF NOT BlueOcc THEN 
+		BlueCmdDown := TRUE;//reblock 
+	END_IF
+
+    IF NOT LTU1_LB THEN
+        LTU1_CmdPush := TRUE;
+    END_IF
+
+    IF LTU1_LB THEN
+        LTU1_CmdPush := FALSE;
+        state := 5;
+    END_IF
+
+5: // RELEASE Purple9_3_1
+	BlueCmdDown := TRUE;//reblock 
+    Purple1CmdDown := FALSE;
+    IF NOT Purple1_Occ THEN
+        state := 6;
+    END_IF
+
+6: // LTU_12_3 cycle (Down + Push)
+    IF NOT LTU2_LB THEN//carrier is reached LTU2 
+        LTU2_MoveDown := TRUE;
+        IF LTU2_PosBottom AND NOT LTU3_Running THEN
+            //LTU2_MoveDown := FALSE;
+            LTU2_CmdPush := TRUE;
+            state := 7;
+        END_IF
+    END_IF
+
+//7: // RELEASE Purple9_3_2
+//    Purple2CmdDown := FALSE;
+//    IF NOT Purple2_Occ THEN
+//        state := 8;
+//    END_IF
+
+7: // LTU_3_6 push (already at Bottom)
+	IF LTU2_LB THEN
+		LTU2_CmdPush := FALSE;
+	END_IF
+    IF NOT LTU3_LB THEN
+        LTU3_CmdPush := TRUE;
+    END_IF
+	IF LTU3_LB THEN
+		LTU3_CmdPush := FALSE;
+		Done := TRUE;
+		state := 0;
+	END_IF
+
+99: // ERROR
+    BlueCmdDown     := TRUE;
+    Purple1CmdDown  := TRUE;
+    Purple2CmdDown  := TRUE;
+    LTU1_CmdPush := FALSE;
+    LTU2_CmdPush := FALSE;
+    LTU3_CmdPush := FALSE;
+    Error := TRUE;
+    IF reset THEN state := 0; END_IF
+END_CASE
+
+// latch new request
+lastRequest := StartRequest;]]></ST>
+    </Implementation>
+    <LineIds Name="FB_TransferChain_UpperToLower">
+      <LineId Id="50" Count="47" />
+      <LineId Id="164" Count="1" />
+      <LineId Id="98" Count="10" />
+      <LineId Id="166" Count="0" />
+      <LineId Id="109" Count="11" />
+      <LineId Id="124" Count="9" />
+      <LineId Id="156" Count="2" />
+      <LineId Id="134" Count="1" />
+      <LineId Id="141" Count="0" />
+      <LineId Id="160" Count="3" />
+      <LineId Id="159" Count="0" />
+      <LineId Id="142" Count="12" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

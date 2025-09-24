@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_SimLTU" Id="{91982585-a594-4344-9251-05523da1c468}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_SimLTU
+VAR_INPUT
+    CmdPush   AT%I*: BOOL;   // push motor command from MAIN (O_LTU_xx_MotorRun)
+    MoveUp    AT%I*: BOOL;   // lift up (hold to continue stepping up)
+    MoveDown  AT%I*: BOOL;   // lift down (hold to continue stepping down)
+    CarrierIn : BOOL;   // carrier entering LTU from conveyor/stopper
+END_VAR
+VAR_OUTPUT
+    MotorOK     AT%Q*: BOOL;   // always TRUE in sim
+    PushRunning AT%Q*: BOOL;   // push motor feedback (RunningIn)
+    PosTop      AT%Q*: BOOL;   // LTU aligned with orange/top
+    PosMid      AT%Q*: BOOL;   // LTU at middle stop
+    PosBottom   AT%Q*: BOOL;   // LTU aligned with green/bottom
+    LightBarrier AT%Q*: BOOL;   // TRUE = empty, FALSE = carrier inside
+    CarrierOut  : BOOL;   // TRUE for one scan when carrier pushed out
+    Occupied    : BOOL;   // TRUE when LTU holds a carrier
+    LiftBusy    : BOOL;   // TRUE while lift is moving
+	Error       : BOOL;   // TRUE if invalid outputs
+END_VAR
+VAR
+    tUp, tDown  : TON;
+    tPush       : TON;
+    CarrierInside: BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// === Motor always healthy ===
+MotorOK := TRUE;
+PushRunning := CmdPush;
+
+// === Truth table for lift ===
+IF (MoveDown AND MoveUp) THEN
+    Error := TRUE; // invalid condition
+ELSIF MoveDown THEN
+    PosBottom := TRUE;
+    PosMid    := FALSE;
+    PosTop    := FALSE;
+    LiftBusy  := TRUE;
+    Error     := FALSE;
+ELSIF MoveUp THEN
+    PosBottom := FALSE;
+    PosMid    := FALSE;
+    PosTop    := TRUE;
+    LiftBusy  := TRUE;
+    Error     := FALSE;
+ELSE
+    PosBottom := FALSE;
+    PosMid    := TRUE;
+    PosTop    := FALSE;
+    LiftBusy  := FALSE;
+    Error     := FALSE;
+END_IF
+
+// === Carrier entering LTU (handshake) ===
+IF CarrierIn AND NOT CarrierInside THEN
+    CarrierInside := TRUE;
+    CarrierIn := FALSE; // consume the carrier from injector
+END_IF
+
+// Light barrier & occupancy
+LightBarrier := NOT CarrierInside;
+Occupied     := CarrierInside;
+
+// === Push motor simulation ===
+tPush(IN := CmdPush AND CarrierInside, PT := T#2S);
+
+IF CarrierInside AND tPush.Q THEN
+    CarrierInside := FALSE;  // carrier leaves LTU
+    CarrierOut    := TRUE;   // one-cycle pulse
+ELSE
+    CarrierOut := FALSE;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="FB_SimLTU">
+      <LineId Id="942" Count="44" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

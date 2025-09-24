@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_DirectTransferGreen" Id="{2ac78df1-cf75-458b-a74d-c0f0f0a9bda7}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_DirectTransferGreen
+VAR_INPUT
+    StartRequest : BOOL;   // reader triggered with correct Dest
+    LTU1_PosOK   : BOOL;   // e.g. LTU_12_3.PosBottom
+    LTU1_Running : BOOL;
+    LTU1_LB      : BOOL;   // LightBarrier TRUE=empty
+    LTU2_PosOK   : BOOL;   // e.g. LTU_3_6.PosBottom
+    LTU2_Running : BOOL;
+    LTU2_LB      : BOOL;
+    BlueOcc      : BOOL;   // Blue stopper Occupied
+END_VAR
+VAR_OUTPUT
+    BlueCmdDown : BOOL;   // TRUE=block, FALSE=release
+	LTU1_MoveDown : BOOL; // True=bottom
+	LTU2_MoveDown : BOOL;
+	LTU1_MotorRunCmd : BOOL; // True=Run
+	LTU2_MotorRunCmd : BOOL;
+    Done        : BOOL;
+    Error       : BOOL;
+END_VAR
+VAR
+    state    : INT := 0;
+    tTimeout : TON;
+	reset: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE state OF
+0: // IDLE
+    BlueCmdDown := TRUE; //Blocking
+    Done := FALSE; Error := FALSE;
+    IF StartRequest THEN
+        // command both LTUs down
+        LTU1_MoveDown := TRUE;
+        LTU2_MoveDown := TRUE;
+        state := 1;
+    END_IF
+
+1: // ALIGN
+    // keep commanding move down until confirmed
+    LTU1_MoveDown := TRUE;
+    LTU2_MoveDown := TRUE;
+
+    IF LTU1_PosOK 
+       AND LTU2_PosOK  THEN
+//        LTU1_MoveDown := FALSE;
+//        LTU2_MoveDown := FALSE;
+        state := 2; // RELEASE
+    END_IF
+
+2: // RELEASE
+    IF BlueOcc THEN
+        BlueCmdDown := FALSE;   // open for release
+        //tTimeout(IN := TRUE, PT := T#8S);
+        state := 3;
+    END_IF
+
+3: // WAIT_ENTER_LT1
+    // Re-block once carrier left Blue
+    IF NOT BlueOcc THEN
+        BlueCmdDown := TRUE;
+    END_IF
+
+    IF NOT LTU1_LB THEN
+        state := 4;
+//        tTimeout(IN := TRUE, PT := T#8S);
+//    ELSIF tTimeout.Q THEN 
+//        state := 99; 
+    END_IF
+
+4: // WAIT_LEAVE_LT1
+	BlueCmdDown := TRUE;//reblock 
+	IF LTU1_PosOK 
+       AND LTU2_PosOK THEN
+		LTU1_MotorRunCmd := TRUE;
+		LTU2_MotorRunCmd := TRUE;
+	END_IF
+    IF LTU1_LB THEN
+        state := 5;
+//        tTimeout(IN := TRUE, PT := T#8S);
+//    ELSIF tTimeout.Q THEN state := 99; 
+	END_IF
+
+5: // WAIT_ENTER_LT2
+    IF NOT LTU2_LB THEN
+        state := 6;
+//        tTimeout(IN := TRUE, PT := T#8S);
+//    ELSIF tTimeout.Q THEN state := 99; 
+	END_IF
+
+6: // WAIT_LEAVE_LT2
+    IF LTU2_LB THEN
+        BlueCmdDown := TRUE;
+        Done := TRUE;
+        state := 0;
+    //ELSIF tTimeout.Q THEN state := 99; 
+	END_IF
+
+99: // ERROR
+    BlueCmdDown := TRUE;
+    Error := TRUE;
+	IF reset THEN
+		 state := 0;
+	END_IF
+   
+END_CASE]]></ST>
+    </Implementation>
+    <LineIds Name="FB_DirectTransferGreen">
+      <LineId Id="72" Count="19" />
+      <LineId Id="93" Count="2" />
+      <LineId Id="104" Count="11" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="117" Count="4" />
+      <LineId Id="47" Count="2" />
+      <LineId Id="146" Count="0" />
+      <LineId Id="142" Count="1" />
+      <LineId Id="135" Count="0" />
+      <LineId Id="141" Count="0" />
+      <LineId Id="145" Count="0" />
+      <LineId Id="50" Count="3" />
+      <LineId Id="130" Count="0" />
+      <LineId Id="54" Count="4" />
+      <LineId Id="128" Count="1" />
+      <LineId Id="60" Count="6" />
+      <LineId Id="131" Count="0" />
+      <LineId Id="67" Count="3" />
+      <LineId Id="122" Count="2" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

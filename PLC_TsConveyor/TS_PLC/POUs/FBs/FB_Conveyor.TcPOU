@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Conveyor" Id="{fdb47728-1e82-4b29-afff-df956afc01be}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Conveyor
+VAR_INPUT
+    CmdRunRequest : BOOL;   // scheduler command
+    MotorOK       AT%I*: BOOL;   // from sensor
+    RunningIn     AT%I*: BOOL;   // from sensor
+    PathClear     : BOOL;
+END_VAR
+VAR_OUTPUT
+    MotorRun      AT%Q*: BOOL;   // Output to motor cmd
+    IsRunning     : BOOL;
+END_VAR
+VAR
+    Motor : FB_MotorUnit;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Motor(CmdRun := (CmdRunRequest AND PathClear),
+      MotorOK := MotorOK,
+      RunningIn := RunningIn);
+
+MotorRun  := Motor.MotorRun;
+IsRunning := Motor.IsRunning;]]></ST>
+    </Implementation>
+    <LineIds Name="FB_Conveyor">
+      <LineId Id="40" Count="4" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,218 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="PRG_SIM" Id="{25a9a6a5-b798-45d4-85c1-858912c1661c}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM PRG_SIM
+VAR
+ SimConv12_6 : FB_SimConveyor;
+ SimConv6_12 : FB_SimConveyor;
+ SimConv3_9 : FB_SimConveyor;
+ SimConv9_3 : FB_SimConveyor;
+
+ SimBlue12 : FB_SimStopper;
+ SimBlue6 : FB_SimStopper;
+ SimBlue3 : FB_SimStopper;
+ SimBlue9 : FB_SimStopper;
+ 
+ SimLTU12_3 : FB_SimLTU;
+ SimLTU3_6 : FB_SimLTU;
+ SimLTU6_9 : FB_SimLTU;
+ SimLTU9_12 : FB_SimLTU;
+ 
+ SimPurp9_3_1: FB_SimStopper;
+ SimPurp9_3_2 : FB_SimStopper;
+ SimPurp3_9_1: FB_SimStopper;
+ SimPurp3_9_2 : FB_SimStopper;
+ 
+ SimReader_12 : FB_SimReader;
+ SimReader_3 : FB_SimReader;
+ SimReader_6 : FB_SimReader;
+ SimReader_9 : FB_SimReader;
+ 
+ Inject_12_3 : FB_InjectAfterRelease;
+ Inject_3_6  : FB_InjectAfterRelease;
+ Inject_12_9 : FB_InjectAfterRelease;
+ Inject_9_6  : FB_InjectAfterRelease;
+ Inject_Trial  : FB_InjectAfterRelease;
+
+ prevBlue12Occ, prevBlue3Occ, prevBlue6Occ, prevBlue9Occ : BOOL;
+ 
+ LTU_12_3_CarrierIn : BOOL;
+ LTU_3_6_CarrierIn : BOOL;
+ LTU_12_9_CarrierIn : BOOL;
+ LTU_9_6_CarrierIn : BOOL;
+	ReleaseTrig: BOOL;
+	CarrierIn: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[SimConv12_6(
+	MotorRun:= , 
+	Release:= , 
+	MotorOK=> , 
+	RunningIn=> , 
+	CarrierAtIn=> , 
+	CarrierAtOut=> );
+
+SimConv6_12(
+	MotorRun:= , 
+	Release:= , 
+	MotorOK=> , 
+	RunningIn=> , 
+	CarrierAtIn=> , 
+	CarrierAtOut=> );
+	
+SimConv3_9(
+	MotorRun:= , 
+	Release:= , 
+	MotorOK=> , 
+	RunningIn=> , 
+	CarrierAtIn=> , 
+	CarrierAtOut=> );
+	
+SimConv9_3(
+	MotorRun:= , 
+	Release:= , 
+	MotorOK=> , 
+	RunningIn=> , 
+	CarrierAtIn=> , 
+	CarrierAtOut=> );
+	
+SimReader_12(
+	TriggerRead:= , 
+	ForceDest:= 6, 
+	Source:= 12, 
+	ReaderValue=> , 
+	Valid=> );
+SimReader_3(
+	TriggerRead:= , 
+	ForceDest:= 0, 
+	Source:= 3, 
+	ReaderValue=> , 
+	Valid=> );
+SimReader_6(
+	TriggerRead:= , 
+	ForceDest:= 0, 
+	Source:= 6, 
+	ReaderValue=> , 
+	Valid=> );
+SimReader_9(
+	TriggerRead:= , 
+	ForceDest:= 0, 
+	Source:= 9, 
+	ReaderValue=> , 
+	Valid=> );		
+	
+SimBlue12(CmdDown:= , CarrierIn:= , Occupied=> , CarrierOut=> );
+SimBlue6(CmdDown:= , CarrierIn:= , Occupied=> , CarrierOut=> );
+SimBlue3(CmdDown:= , CarrierIn:= , Occupied=> , CarrierOut=> );
+SimBlue9(CmdDown:= , CarrierIn:= , Occupied=> , CarrierOut=> );
+
+SimPurp9_3_1(CmdDown:= , CarrierIn:= , Occupied=> , CarrierOut=> );
+SimPurp9_3_2(CmdDown:= , CarrierIn:= , Occupied=> , CarrierOut=> );
+SimPurp3_9_1(CmdDown:= , CarrierIn:= , Occupied=> , CarrierOut=> );
+SimPurp3_9_2(CmdDown:= , CarrierIn:= , Occupied=> , CarrierOut=> );
+
+
+SimLTU12_3(
+	CmdPush:= , 
+	MoveUp:= , 
+	MoveDown:= , 
+	CarrierIn:= , 
+	MotorOK=> , 
+	PushRunning=> , 
+	PosTop=> , 
+	PosMid=> , 
+	PosBottom=> , 
+	LightBarrier=> , 
+	CarrierOut=> , 
+	Occupied=> , 
+	LiftBusy=> );
+	
+SimLTU3_6(
+	CmdPush:= , 
+	MoveUp:= , 
+	MoveDown:= , 
+	CarrierIn:= , 
+	MotorOK=> , 
+	PushRunning=> , 
+	PosTop=> , 
+	PosMid=> , 
+	PosBottom=> , 
+	LightBarrier=> , 
+	CarrierOut=> , 
+	Occupied=> , 
+	LiftBusy=> );
+	
+SimLTU6_9(
+	CmdPush:= , 
+	MoveUp:= , 
+	MoveDown:= , 
+	CarrierIn:= , 
+	MotorOK=> , 
+	PushRunning=> , 
+	PosTop=> , 
+	PosMid=> , 
+	PosBottom=> , 
+	LightBarrier=> , 
+	CarrierOut=> , 
+	Occupied=> , 
+	LiftBusy=> );
+	
+SimLTU9_12(
+	CmdPush:= , 
+	MoveUp:= , 
+	MoveDown:= , 
+	CarrierIn:= LTU_12_9_CarrierIn, 
+	MotorOK=> , 
+	PushRunning=> , 
+	PosTop=> , 
+	PosMid=> , 
+	PosBottom=> , 
+	LightBarrier=> , 
+	CarrierOut=> , 
+	Occupied=> , 
+	LiftBusy=> );
+
+
+
+	]]></ST>
+    </Implementation>
+    <LineIds Name="PRG_SIM">
+      <LineId Id="700" Count="5" />
+      <LineId Id="698" Count="1" />
+      <LineId Id="706" Count="5" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="844" Count="0" />
+      <LineId Id="846" Count="5" />
+      <LineId Id="845" Count="0" />
+      <LineId Id="852" Count="0" />
+      <LineId Id="854" Count="5" />
+      <LineId Id="853" Count="0" />
+      <LineId Id="715" Count="0" />
+      <LineId Id="1006" Count="22" />
+      <LineId Id="1004" Count="1" />
+      <LineId Id="716" Count="1" />
+      <LineId Id="843" Count="0" />
+      <LineId Id="842" Count="0" />
+      <LineId Id="899" Count="0" />
+      <LineId Id="902" Count="2" />
+      <LineId Id="900" Count="1" />
+      <LineId Id="726" Count="0" />
+      <LineId Id="774" Count="12" />
+      <LineId Id="762" Count="0" />
+      <LineId Id="787" Count="0" />
+      <LineId Id="789" Count="12" />
+      <LineId Id="788" Count="0" />
+      <LineId Id="802" Count="0" />
+      <LineId Id="804" Count="12" />
+      <LineId Id="803" Count="0" />
+      <LineId Id="817" Count="0" />
+      <LineId Id="819" Count="12" />
+      <LineId Id="818" Count="0" />
+      <LineId Id="839" Count="0" />
+      <LineId Id="864" Count="0" />
+      <LineId Id="1003" Count="0" />
+      <LineId Id="874" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

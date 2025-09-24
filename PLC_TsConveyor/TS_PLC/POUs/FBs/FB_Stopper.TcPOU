@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Stopper" Id="{4bc4e749-22bb-4329-a517-fb6d05e5b963}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Stopper
+VAR_INPUT
+    CmdDown   : BOOL;   // TRUE = stopper down (block carrier)
+    OccupiedIn AT%I*: BOOL;   // Sensor input
+END_VAR
+VAR_OUTPUT
+    StopperDown AT%Q*: BOOL; // Actuator output
+    Occupied    : BOOL; // Output copy of sensor
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Direct assignments
+StopperDown := CmdDown;
+Occupied    := OccupiedIn;]]></ST>
+    </Implementation>
+    <LineIds Name="FB_Stopper">
+      <LineId Id="17" Count="1" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

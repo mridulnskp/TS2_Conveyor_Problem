@@ -1,0 +1,719 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="MAIN" Id="{f819719c-9d2f-4b81-8351-d33247421314}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	InitFB : FB_Init;
+	
+	Conv12_6 : FB_Conveyor;
+	Conv6_12 : FB_Conveyor;
+	Conv3_9 : FB_Conveyor;
+	Conv9_3 : FB_Conveyor;
+	
+	Blue12 : FB_Stopper;
+	Blue6 : FB_Stopper;
+	Blue3 : FB_Stopper;
+	Blue9 : FB_Stopper;
+	
+	LTU_12_3 : FB_LTU;
+	LTU_3_6 : FB_LTU;
+	LTU_6_9 : FB_LTU;
+	LTU_9_12 : FB_LTU;
+	
+	Purple9_3_1 : FB_Stopper;
+	Purple9_3_2 : FB_Stopper;
+	Purple3_9_1 : FB_Stopper;
+	Purple3_9_2 : FB_Stopper;
+	
+	Reader12 : FB_Reader;
+	Reader3 : FB_Reader;
+	Reader6 : FB_Reader;
+	Reader9 : FB_Reader;
+	tPulse : TP;
+	tPulse1 : TP;
+	startRead: BOOL;
+	
+	
+	Blue12_Occupied: BOOL;
+	LTU_3_6_LightBarrierIn: BOOL;
+	LTU_12_3_LightBarrierIn: BOOL;
+	
+	Blue6_Occupied: BOOL;
+	LTU_6_9_LightBarrierIn: BOOL;
+	LTU_9_12_LightBarrierIn: BOOL;
+	
+	
+	Blue9_Occupied: BOOL;
+	Purple9_3_1_Occ: BOOL;
+	Purple9_3_2_Occ: BOOL;
+	
+	//Scheduler : FB_Scheduler;
+	Scheduler : FB_Scheduler_Queue;
+	
+	Transfer_12_6 : FB_DirectTransferGreen;
+	Transfer_6_12 : FB_DirectTransferGreen;
+	
+	Transfer_9_3 : FB_DirectTransferOrange;
+	Transfer_3_9 : FB_DirectTransferOrange;
+	
+	Transfer_12_3 : FB_TransferCorner_LowerToUpper;
+	Transfer_6_9 : FB_TransferCorner_LowerToUpper;
+	Transfer_3_6 : FB_TransferCorner_UpperToLower;
+	Transfer_9_12 : FB_TransferCorner_UpperToLower;
+	
+	Transfer_12_9 : FB_TransferChain_LowerToUpper;
+	Transfer_6_3 : FB_TransferChain_LowerToUpper;
+	Transfer_9_6 : FB_TransferChain_UpperToLower;
+	Transfer_3_12 : FB_TransferChain_UpperToLower;
+	
+	
+	DebugWhoWroteBlue6: STRING(128);
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[InitFB(
+    Reset     := ,   // manual reset button/flag
+    Blue12    := Blue12,
+    Blue3     := Blue3,
+    Blue6     := Blue6,
+    Blue9     := Blue9,
+    Purple9_3_1 := Purple9_3_1,
+    Purple9_3_2 := Purple9_3_2,
+    Purple3_9_1 := Purple3_9_1,
+    Purple3_9_2 := Purple3_9_2,
+    LTU_12_3 := LTU_12_3,
+    LTU_3_6  := LTU_3_6,
+    LTU_6_9  := LTU_6_9,
+    LTU_9_12 := LTU_9_12,
+    Scheduler := Scheduler
+);
+
+Conv12_6(
+	CmdRunRequest:= TRUE, 
+	MotorOK:= , 
+	RunningIn:= , 
+	PathClear:= TRUE, 
+	MotorRun=> , 
+	IsRunning=> );
+	
+Conv6_12(
+	CmdRunRequest:= TRUE, 
+	MotorOK:= , 
+	RunningIn:= , 
+	PathClear:= TRUE, 
+	MotorRun=> , 
+	IsRunning=> );
+
+Conv3_9(
+	CmdRunRequest:= TRUE, 
+	MotorOK:= , 
+	RunningIn:= , 
+	PathClear:= TRUE, 
+	MotorRun=> , 
+	IsRunning=> );
+	
+Conv9_3(
+	CmdRunRequest:= TRUE, 
+	MotorOK:= , 
+	RunningIn:= , 
+	PathClear:= TRUE, 
+	MotorRun=> , 
+	IsRunning=> );
+
+
+	
+Blue12(CmdDown:= , OccupiedIn:= , StopperDown=> , Occupied=> );
+Blue6(CmdDown:= , OccupiedIn:= , StopperDown=> , Occupied=> );
+Blue3(CmdDown:= , OccupiedIn:= , StopperDown=> , Occupied=> );
+Blue9(CmdDown:= , OccupiedIn:= , StopperDown=> , Occupied=> );
+
+LTU_12_3(
+	CmdMoveUp:= , 
+	CmdMoveDown:= ,  
+	MotorOK:= , 
+	RunningIn:= , 
+	LightBarrierIn:= , 
+	PosBottomIn:= , 
+	PosMidIn:= , 
+	PosTopIn:= , 
+	CylToTop=> , 
+	CylToBottom=> , 
+	LTU_MotorRun=> , 
+	IsRunning=> , 
+	PosBottom=> , 
+	PosMid=> , 
+	PosTop=> , 
+	IsFree=> );
+	
+LTU_3_6(
+	CmdMoveUp:= , 
+	CmdMoveDown:= ,  
+	MotorOK:= , 
+	RunningIn:= , 
+	LightBarrierIn:= , 
+	PosBottomIn:= , 
+	PosMidIn:= , 
+	PosTopIn:= , 
+	CylToTop=> , 
+	CylToBottom=> , 
+	LTU_MotorRun=> , 
+	IsRunning=> , 
+	PosBottom=> , 
+	PosMid=> , 
+	PosTop=> , 
+	IsFree=> );
+LTU_6_9(
+	CmdMoveUp:= , 
+	CmdMoveDown:= ,  
+	MotorOK:= , 
+	RunningIn:= , 
+	LightBarrierIn:= , 
+	PosBottomIn:= , 
+	PosMidIn:= , 
+	PosTopIn:= , 
+	CylToTop=> , 
+	CylToBottom=> , 
+	LTU_MotorRun=> , 
+	IsRunning=> , 
+	PosBottom=> , 
+	PosMid=> , 
+	PosTop=> , 
+	IsFree=> );
+LTU_9_12(
+	CmdMoveUp:= , 
+	CmdMoveDown:= ,  
+	MotorOK:= , 
+	RunningIn:= , 
+	LightBarrierIn:= , 
+	PosBottomIn:= , 
+	PosMidIn:= , 
+	PosTopIn:= , 
+	CylToTop=> , 
+	CylToBottom=> , 
+	LTU_MotorRun=> , 
+	IsRunning=> , 
+	PosBottom=> , 
+	PosMid=> , 
+	PosTop=> , 
+	IsFree=> );
+	
+Purple9_3_1(CmdDown:= , OccupiedIn:= , StopperDown=> , Occupied=> );
+Purple9_3_2(CmdDown:= , OccupiedIn:= , StopperDown=> , Occupied=> );
+Purple3_9_1(CmdDown:= , OccupiedIn:= , StopperDown=> , Occupied=> );
+Purple3_9_2(CmdDown:= , OccupiedIn:= , StopperDown=> , Occupied=> );	
+
+	
+Reader12(TriggerRead:= ,Dest:=9, ReaderValue=> , Valid=> );	
+Reader3(TriggerRead:= ,Dest:=6, ReaderValue=> , Valid=> );	
+Reader6(TriggerRead:= ,Dest:=9, ReaderValue=> , Valid=> );	
+Reader9(TriggerRead:= ,Dest:=6, ReaderValue=> , Valid=> );	
+
+// Scheduler -- Only start a transfer if the system is free (no other active transfer)
+// Run Scheduler
+Scheduler(
+    Reader12_Valid := Reader12.Valid,
+    Reader12_Value := Reader12.ReaderValue,
+    Reader3_Valid  := Reader3.Valid,
+    Reader3_Value  := Reader3.ReaderValue,
+    Reader6_Valid  := Reader6.Valid,
+    Reader6_Value  := Reader6.ReaderValue,
+    Reader9_Valid  := Reader9.Valid,
+    Reader9_Value  := Reader9.ReaderValue,
+
+    // pass Done flags from all transfer FBs
+    T12_6_Done := Transfer_12_6.Done,
+    T6_12_Done := Transfer_6_12.Done,
+    T9_3_Done  := Transfer_9_3.Done,
+    T3_9_Done  := Transfer_3_9.Done,
+    T12_3_Done := Transfer_12_3.Done,
+    T6_9_Done  := Transfer_6_9.Done,
+    T3_6_Done  := Transfer_3_6.Done,
+    T9_12_Done := Transfer_9_12.Done,
+    T12_9_Done := Transfer_12_9.Done,
+    T6_3_Done  := Transfer_6_3.Done,
+    T9_6_Done  := Transfer_9_6.Done,
+    T3_12_Done := Transfer_3_12.Done,
+
+    Reset := 
+);
+
+
+
+CASE Scheduler.activeRoute OF
+	//..................*** Direct Transfer Green or Lower
+	126:Transfer_12_6(
+		StartRequest := Scheduler.Start_12_6,
+		LTU1_PosOK   := LTU_12_3.PosBottom,
+		LTU1_Running := LTU_12_3.IsRunning,
+		LTU1_LB      := LTU_12_3_LightBarrierIn,
+		LTU2_PosOK   := LTU_3_6.PosBottom,
+		LTU2_Running := LTU_3_6.IsRunning,
+		LTU2_LB      := LTU_3_6_LightBarrierIn,
+		BlueOcc      := Blue12_Occupied,
+	
+		BlueCmdDown  => Blue12.CmdDown,
+		Done         => ,
+		Error        => ,
+		LTU1_MoveDown=> LTU_12_3.CmdMoveDown,
+		LTU2_MoveDown=>	LTU_3_6.CmdMoveDown,
+	);
+	612:Transfer_6_12(
+		StartRequest := Scheduler.Start_6_12,
+		LTU1_PosOK   := LTU_6_9.PosBottom,
+		LTU1_Running := LTU_6_9.IsRunning,
+		LTU1_LB      := LTU_6_9_LightBarrierIn,
+		LTU2_PosOK   := LTU_9_12.PosBottom,
+		LTU2_Running := LTU_9_12.IsRunning,
+		LTU2_LB      := LTU_9_12_LightBarrierIn,
+		BlueOcc      := Blue6_Occupied,
+	
+		BlueCmdDown  => Blue6.CmdDown,
+		Done         => ,
+		Error        => ,
+		LTU1_MoveDown=> LTU_6_9.CmdMoveDown,
+		LTU2_MoveDown=>	LTU_9_12.CmdMoveDown
+	);
+	DebugWhoWroteBlue6 := 'Transfer_6_12';
+	//.................*** Direct Transfer Orange or Upper
+	93:Transfer_9_3(
+		StartRequest:= Scheduler.Start_9_3, 
+		LTU1_PosOK:= LTU_9_12.PosTop, 
+		LTU1_Running:= LTU_9_12.IsRunning, 
+		LTU1_LB:= LTU_9_12_LightBarrierIn, 
+		LTU2_PosOK:= LTU_12_3.PosTop, 
+		LTU2_Running:= LTU_12_3.IsRunning, 
+		LTU2_LB:= LTU_12_3_LightBarrierIn, 
+		BlueOcc:= Blue9_Occupied, 
+		Purple1Occ:= Purple9_3_1_Occ, 
+		Purple2Occ:= Purple9_3_2_Occ, 
+		reset:= , 
+		BlueCmdDown=> Blue9.CmdDown, 
+		Purple1CmdDown=> Purple9_3_1.CmdDown, 
+		Purple2CmdDown=> Purple9_3_2.CmdDown, 
+		LTU1_MoveUp=> LTU_9_12.CmdMoveUp, 
+		LTU2_MoveUp=> LTU_12_3.CmdMoveUp, 
+		Done=> , 
+		Error=> 
+	);
+	
+	39:Transfer_3_9(
+		StartRequest := Scheduler.Start_3_9,
+	
+		// LTU_3_6
+		LTU1_PosOK   := LTU_3_6.PosTop,
+		LTU1_Running := LTU_3_6.IsRunning,
+		LTU1_LB      := LTU_3_6.LightBarrierIn,
+	
+		// LTU_6_9
+		LTU2_PosOK   := LTU_6_9.PosTop,
+		LTU2_Running := LTU_6_9.IsRunning,
+		LTU2_LB      := LTU_6_9.LightBarrierIn,
+	
+		// Stoppers
+		BlueOcc      := Blue3.OccupiedIn,
+		Purple1Occ   := Purple3_9_1.OccupiedIn,
+		Purple2Occ   := Purple3_9_2.OccupiedIn,
+	
+		reset        := ,
+	
+		// Outputs
+		BlueCmdDown   => Blue3.CmdDown,
+		Purple1CmdDown=> Purple3_9_1.CmdDown,
+		Purple2CmdDown=> Purple3_9_2.CmdDown,
+		LTU1_MoveUp   => LTU_3_6.CmdMoveUp,
+		LTU2_MoveUp   => LTU_6_9.CmdMoveUp,
+	
+		Done  => ,
+		Error => 
+	);
+	
+	//.........*************lower to upper corner****************
+	123:Transfer_12_3(
+		StartRequest:= Scheduler.Start_12_3, 
+		LTU_PosTop:= LTU_12_3.PosTop, 
+		LTU_PosBottom:= LTU_12_3.PosBottom, 
+		LTU_Running:= LTU_12_3.IsRunning, 
+		LTU_LB:= LTU_12_3.LightBarrierIn, 
+		BlueOcc:= Blue12.OccupiedIn, 
+		PurpleOcc:= Purple9_3_2.OccupiedIn, 
+		reset:= , 
+		BlueCmdDown=> Blue12.CmdDown, 
+		PurpleCmdDown=> Purple9_3_2.CmdDown, 
+		LTU_MoveUp=> LTU_12_3.CmdMoveUp, 
+		LTU_MoveDown=> LTU_12_3.CmdMoveDown, 
+		LTU_CmdPush=> LTU_12_3.CmdRun, 
+		Done=> , 
+		Error=> );
+		
+	69:Transfer_6_9(
+		StartRequest := Scheduler.Start_6_9,
+	
+		// LTU_6_9
+		LTU_PosTop    := LTU_6_9.PosTop,
+		LTU_PosBottom := LTU_6_9.PosBottom,
+		LTU_Running   := LTU_6_9.IsRunning,
+		LTU_LB        := LTU_6_9.LightBarrierIn,
+	
+		// Stoppers
+		BlueOcc       := Blue6.OccupiedIn,
+		PurpleOcc     := Purple3_9_2.OccupiedIn,
+	
+		reset         := ,
+	
+		// Outputs
+		BlueCmdDown   => Blue6.CmdDown,
+		PurpleCmdDown => Purple3_9_2.CmdDown,
+		LTU_MoveUp    => LTU_6_9.CmdMoveUp,
+		LTU_MoveDown  => LTU_6_9.CmdMoveDown,
+		LTU_CmdPush   => LTU_6_9.CmdRun,
+	
+		Done          => ,
+		Error         => 
+	);
+	DebugWhoWroteBlue6 := 'Transfer_6_9';
+	//...........**************Upper to Lower Corner.............................
+	36:Transfer_3_6(
+		StartRequest  := Scheduler.Start_3_6,
+	
+		LTU_PosTop    := LTU_3_6.PosTop,
+		LTU_PosBottom := LTU_3_6.PosBottom,
+		LTU_Running   := LTU_3_6.IsRunning,
+		LTU_LB        := LTU_3_6.LightBarrierIn,
+	
+		BlueOcc       := Blue3.OccupiedIn,
+		PurpleOcc     := Purple3_9_1.OccupiedIn,
+	
+		reset         := ,             // or leave blank if you handle reset elsewhere
+	
+		BlueCmdDown   => Blue3.CmdDown,
+		PurpleCmdDown => Purple3_9_1.CmdDown,
+		LTU_MoveUp    => LTU_3_6.CmdMoveUp,
+		LTU_MoveDown  => LTU_3_6.CmdMoveDown,
+		LTU_CmdPush   => LTU_3_6.CmdRun,
+	
+		Done          => ,
+		Error         => 
+	);
+	912:Transfer_9_12(
+		StartRequest  := Scheduler.Start_9_12,
+	
+		LTU_PosTop    := LTU_9_12.PosTop,
+		LTU_PosBottom := LTU_9_12.PosBottom,
+		LTU_Running   := LTU_9_12.IsRunning,
+		LTU_LB        := LTU_9_12.LightBarrierIn,
+	
+		BlueOcc       := Blue9.OccupiedIn,
+		PurpleOcc     := Purple9_3_1.OccupiedIn,
+	
+		reset         := ,   // or hook up your reset signal
+	
+		BlueCmdDown   => Blue9.CmdDown,
+		PurpleCmdDown => Purple9_3_1.CmdDown,
+		LTU_MoveUp    => LTU_9_12.CmdMoveUp,
+		LTU_MoveDown  => LTU_9_12.CmdMoveDown,
+		LTU_CmdPush   => LTU_9_12.CmdRun,
+	
+		Done          => ,
+		Error         => 
+	);
+	
+	
+	// ............ Multi-hop transfer (12 -> 9) .............................
+	//.......Lower to Upper Chain transfer....................................
+	129:Transfer_12_9(
+		StartRequest  := Scheduler.Start_12_9,
+		reset         := ,
+	
+		// Blue12
+		BlueOcc       := Blue12.OccupiedIn,
+	
+		// LTU_12_3
+		LTU1_PosBottom:= LTU_12_3.PosBottom,
+		LTU1_PosTop   := LTU_12_3.PosTop,
+		LTU1_Running  := LTU_12_3.IsRunning,
+		LTU1_LB       := LTU_12_3.LightBarrierIn,
+	
+		// LTU_3_6
+		LTU2_PosBottom:= LTU_3_6.PosBottom,
+		LTU2_PosTop   := LTU_3_6.PosTop,
+		LTU2_Running  := LTU_3_6.IsRunning,
+		LTU2_LB       := LTU_3_6.LightBarrierIn,
+	
+		// LTU_6_9
+		LTU3_PosBottom:= LTU_6_9.PosBottom,
+		LTU3_PosTop   := LTU_6_9.PosTop,
+		LTU3_Running  := LTU_6_9.IsRunning,
+		LTU3_LB       := LTU_6_9.LightBarrierIn,
+	
+		// Purples
+		Purple1_Occ   := Purple9_3_2.OccupiedIn,   // first purple in chain
+		Purple2_Occ   := Purple3_9_1.OccupiedIn,   // middle purple
+		Purple3_Occ   := Purple3_9_2.OccupiedIn,   // final purple at exit
+	
+		// Outputs
+		BlueCmdDown   => Blue12.CmdDown,
+		Purple1CmdDown=> Purple9_3_2.CmdDown,
+		Purple2CmdDown=> Purple3_9_1.CmdDown,
+		Purple3CmdDown=> Purple3_9_2.CmdDown,
+	
+		LTU1_CmdPush  => LTU_12_3.CmdRun,
+		LTU1_MoveUp   => LTU_12_3.CmdMoveUp,
+		LTU1_MoveDown => LTU_12_3.CmdMoveDown,
+	
+		LTU2_CmdPush  => LTU_3_6.CmdRun,
+		LTU2_MoveUp   => LTU_3_6.CmdMoveUp,
+		LTU2_MoveDown => LTU_3_6.CmdMoveDown,
+	
+		LTU3_CmdPush  => LTU_6_9.CmdRun,
+		LTU3_MoveUp   => LTU_6_9.CmdMoveUp,
+		LTU3_MoveDown => LTU_6_9.CmdMoveDown,
+	
+		Done          => ,
+		Error         => 
+	);
+	63:Transfer_6_3(
+		StartRequest  := Scheduler.Start_6_3,
+		reset         := ,
+	
+		// Blue6
+		BlueOcc       := Blue6.OccupiedIn,
+	
+		// LTU_6_9
+		LTU1_PosBottom:= LTU_6_9.PosBottom,
+		LTU1_PosTop   := LTU_6_9.PosTop,
+		LTU1_Running  := LTU_6_9.IsRunning,
+		LTU1_LB       := LTU_6_9.LightBarrierIn,
+	
+		// LTU_9_12
+		LTU2_PosBottom:= LTU_9_12.PosBottom,
+		LTU2_PosTop   := LTU_9_12.PosTop,
+		LTU2_Running  := LTU_9_12.IsRunning,
+		LTU2_LB       := LTU_9_12.LightBarrierIn,
+	
+		// LTU_12_3
+		LTU3_PosBottom:= LTU_12_3.PosBottom,
+		LTU3_PosTop   := LTU_12_3.PosTop,
+		LTU3_Running  := LTU_12_3.IsRunning,
+		LTU3_LB       := LTU_12_3.LightBarrierIn,
+	
+		// Purples
+		Purple1_Occ   := Purple3_9_2.OccupiedIn,
+		Purple2_Occ   := Purple9_3_1.OccupiedIn,
+		Purple3_Occ   := Purple9_3_2.OccupiedIn,
+	
+		// Outputs
+		BlueCmdDown   => Blue6.CmdDown,
+		Purple1CmdDown=> Purple3_9_2.CmdDown,
+		Purple2CmdDown=> Purple9_3_1.CmdDown,
+		Purple3CmdDown=> Purple9_3_2.CmdDown,
+	
+		LTU1_CmdPush  => LTU_6_9.CmdRun,
+		LTU1_MoveUp   => LTU_6_9.CmdMoveUp,
+		LTU1_MoveDown => LTU_6_9.CmdMoveDown,
+	
+		LTU2_CmdPush  => LTU_9_12.CmdRun,
+		LTU2_MoveUp   => LTU_9_12.CmdMoveUp,
+		LTU2_MoveDown => LTU_9_12.CmdMoveDown,
+	
+		LTU3_CmdPush  => LTU_12_3.CmdRun,
+		LTU3_MoveUp   => LTU_12_3.CmdMoveUp,
+		LTU3_MoveDown => LTU_12_3.CmdMoveDown,
+	
+		Done          => ,
+		Error         => 
+	);
+	DebugWhoWroteBlue6 := 'Transfer_6_3';
+	
+	//.......Upper to Lower Chain transfer....................................
+	96:Transfer_9_6(
+		StartRequest  := Scheduler.Start_9_6,
+		reset         := ,
+	
+		// Blue9
+		BlueOcc       := Blue9.OccupiedIn,
+	
+		// LTU_9_12
+		LTU1_PosBottom:= LTU_9_12.PosBottom,
+		LTU1_PosTop   := LTU_9_12.PosTop,
+		LTU1_Running  := LTU_9_12.IsRunning,
+		LTU1_LB       := LTU_9_12.LightBarrierIn,
+	
+		// LTU_12_3
+		LTU2_PosBottom:= LTU_12_3.PosBottom,
+		LTU2_PosTop   := LTU_12_3.PosTop,
+		LTU2_Running  := LTU_12_3.IsRunning,
+		LTU2_LB       := LTU_12_3.LightBarrierIn,
+	
+		// LTU_3_6
+		LTU3_PosBottom:= LTU_3_6.PosBottom,
+		LTU3_PosTop   := LTU_3_6.PosTop,
+		LTU3_Running  := LTU_3_6.IsRunning,
+		LTU3_LB       := LTU_3_6.LightBarrierIn,
+	
+		// Purples
+		Purple1_Occ   := Purple9_3_1.OccupiedIn,   // first purple in path
+		Purple2_Occ   := Purple9_3_2.OccupiedIn,   // second purple
+	
+		// Outputs
+		BlueCmdDown   => Blue9.CmdDown,
+		Purple1CmdDown=> Purple9_3_1.CmdDown,
+		Purple2CmdDown=> Purple9_3_2.CmdDown,
+	
+		LTU1_CmdPush  => LTU_9_12.CmdRun,
+		LTU1_MoveUp   => LTU_9_12.CmdMoveUp,
+		LTU1_MoveDown => LTU_9_12.CmdMoveDown,
+	
+		LTU2_CmdPush  => LTU_12_3.CmdRun,
+		LTU2_MoveUp   => LTU_12_3.CmdMoveUp,
+		LTU2_MoveDown => LTU_12_3.CmdMoveDown,
+	
+		LTU3_CmdPush  => LTU_3_6.CmdRun,
+		LTU3_MoveUp   => LTU_3_6.CmdMoveUp,
+		LTU3_MoveDown => LTU_3_6.CmdMoveDown,
+	
+		Done          => ,
+		Error         => 
+	);	
+	312:Transfer_3_12(
+		StartRequest  := Scheduler.Start_3_12,
+		reset         := ,
+	
+		// Blue3
+		BlueOcc       := Blue3.OccupiedIn,
+	
+		// LTU_3_6
+		LTU1_PosBottom:= LTU_3_6.PosBottom,
+		LTU1_PosTop   := LTU_3_6.PosTop,
+		LTU1_Running  := LTU_3_6.IsRunning,
+		LTU1_LB       := LTU_3_6.LightBarrierIn,
+	
+		// LTU_6_9
+		LTU2_PosBottom:= LTU_6_9.PosBottom,
+		LTU2_PosTop   := LTU_6_9.PosTop,
+		LTU2_Running  := LTU_6_9.IsRunning,
+		LTU2_LB       := LTU_6_9.LightBarrierIn,
+	
+		// LTU_9_12
+		LTU3_PosBottom:= LTU_9_12.PosBottom,
+		LTU3_PosTop   := LTU_9_12.PosTop,
+		LTU3_Running  := LTU_9_12.IsRunning,
+		LTU3_LB       := LTU_9_12.LightBarrierIn,
+	
+		// Purples
+		Purple1_Occ   := Purple3_9_1.OccupiedIn,
+		Purple2_Occ   := Purple3_9_2.OccupiedIn,
+		Purple3_Occ   := Purple9_3_1.OccupiedIn,
+	
+		// Outputs
+		BlueCmdDown   => Blue3.CmdDown,
+		Purple1CmdDown=> Purple3_9_1.CmdDown,
+		Purple2CmdDown=> Purple3_9_2.CmdDown,
+		Purple3CmdDown=> Purple9_3_1.CmdDown,
+	
+		LTU1_CmdPush  => LTU_3_6.CmdRun,
+		LTU1_MoveUp   => LTU_3_6.CmdMoveUp,
+		LTU1_MoveDown => LTU_3_6.CmdMoveDown,
+	
+		LTU2_CmdPush  => LTU_6_9.CmdRun,
+		LTU2_MoveUp   => LTU_6_9.CmdMoveUp,
+		LTU2_MoveDown => LTU_6_9.CmdMoveDown,
+	
+		LTU3_CmdPush  => LTU_9_12.CmdRun,
+		LTU3_MoveUp   => LTU_9_12.CmdMoveUp,
+		LTU3_MoveDown => LTU_9_12.CmdMoveDown,
+	
+		Done          => ,
+		Error         => 
+	);
+ELSE
+    // no active route → don’t call any transfer FB
+	//DebugWhoWroteBlue6 := 'NONE';
+END_CASE
+
+
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="MAIN">
+      <LineId Id="1063" Count="15" />
+      <LineId Id="191" Count="0" />
+      <LineId Id="198" Count="5" />
+      <LineId Id="192" Count="0" />
+      <LineId Id="207" Count="0" />
+      <LineId Id="209" Count="5" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="319" Count="0" />
+      <LineId Id="326" Count="5" />
+      <LineId Id="316" Count="0" />
+      <LineId Id="332" Count="0" />
+      <LineId Id="334" Count="5" />
+      <LineId Id="333" Count="0" />
+      <LineId Id="317" Count="1" />
+      <LineId Id="217" Count="2" />
+      <LineId Id="306" Count="0" />
+      <LineId Id="305" Count="0" />
+      <LineId Id="228" Count="3" />
+      <LineId Id="233" Count="12" />
+      <LineId Id="227" Count="0" />
+      <LineId Id="246" Count="0" />
+      <LineId Id="248" Count="2" />
+      <LineId Id="252" Count="12" />
+      <LineId Id="247" Count="0" />
+      <LineId Id="266" Count="2" />
+      <LineId Id="270" Count="12" />
+      <LineId Id="265" Count="0" />
+      <LineId Id="284" Count="2" />
+      <LineId Id="288" Count="12" />
+      <LineId Id="283" Count="0" />
+      <LineId Id="307" Count="1" />
+      <LineId Id="312" Count="2" />
+      <LineId Id="376" Count="0" />
+      <LineId Id="309" Count="1" />
+      <LineId Id="349" Count="2" />
+      <LineId Id="815" Count="0" />
+      <LineId Id="311" Count="0" />
+      <LineId Id="828" Count="26" />
+      <LineId Id="810" Count="1" />
+      <LineId Id="814" Count="0" />
+      <LineId Id="799" Count="0" />
+      <LineId Id="355" Count="0" />
+      <LineId Id="357" Count="12" />
+      <LineId Id="374" Count="1" />
+      <LineId Id="370" Count="0" />
+      <LineId Id="386" Count="14" />
+      <LineId Id="356" Count="0" />
+      <LineId Id="1100" Count="0" />
+      <LineId Id="404" Count="18" />
+      <LineId Id="403" Count="0" />
+      <LineId Id="904" Count="0" />
+      <LineId Id="855" Count="0" />
+      <LineId Id="874" Count="28" />
+      <LineId Id="905" Count="0" />
+      <LineId Id="428" Count="0" />
+      <LineId Id="354" Count="0" />
+      <LineId Id="435" Count="14" />
+      <LineId Id="432" Count="0" />
+      <LineId Id="908" Count="0" />
+      <LineId Id="910" Count="24" />
+      <LineId Id="452" Count="1" />
+      <LineId Id="520" Count="21" />
+      <LineId Id="936" Count="21" />
+      <LineId Id="935" Count="0" />
+      <LineId Id="518" Count="0" />
+      <LineId Id="690" Count="52" />
+      <LineId Id="958" Count="50" />
+      <LineId Id="1099" Count="0" />
+      <LineId Id="494" Count="0" />
+      <LineId Id="429" Count="0" />
+      <LineId Id="744" Count="47" />
+      <LineId Id="430" Count="0" />
+      <LineId Id="1010" Count="52" />
+      <LineId Id="1098" Count="0" />
+      <LineId Id="1009" Count="0" />
+      <LineId Id="1083" Count="0" />
+      <LineId Id="1096" Count="0" />
+      <LineId Id="1081" Count="0" />
+      <LineId Id="820" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

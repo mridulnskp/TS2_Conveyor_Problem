@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_SimReader" Id="{f820eaec-fa3a-4bcc-a9d3-ef92f2dc3718}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_SimReader
+VAR_INPUT
+    TriggerRead AT%I*: BOOL;   // pulse from simulation (like tTrig.Q)
+    ForceDest   : INT := 0; // 0 = random, else fixed destination (12/3/6/9)
+	Source      : INT;      // reader's location (12,3,6,9)
+END_VAR
+VAR_OUTPUT
+    ReaderValue AT%Q*: INT;    // chosen destination
+    Valid       : BOOL;   // TRUE for one cycle
+END_VAR
+VAR
+    lastTrigger : BOOL;
+    seed        : UDINT := 12345;
+    pick        : INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Rising edge detection
+IF TriggerRead AND NOT lastTrigger THEN
+    IF ForceDest <> 0 THEN
+        // Use forced destination
+        ReaderValue := ForceDest;
+    ELSE
+        // Generate random until != Source
+        REPEAT
+            seed := (1103515245 * seed + 12345);
+            CASE (seed MOD 4) OF
+                0: pick := 12;
+                1: pick := 3;
+                2: pick := 6;
+                3: pick := 9;
+            END_CASE
+        UNTIL pick <> Source
+        END_REPEAT;
+        ReaderValue := pick;
+    END_IF
+    Valid := TRUE;
+ELSE
+    Valid := FALSE;
+END_IF
+
+lastTrigger := TriggerRead;]]></ST>
+    </Implementation>
+    <LineIds Name="FB_SimReader">
+      <LineId Id="96" Count="23" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
