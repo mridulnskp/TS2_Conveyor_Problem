@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_AutoPlace" Id="{8f407f19-b82e-4e02-897c-85d6d44e4f47}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_AutoPlace
+VAR_INPUT
+	BlueStopper : BOOL;
+	
+END_VAR
+VAR_OUTPUT
+	Reader_Trigger : BOOL;
+END_VAR
+VAR
+	Cont_Timer : ton;
+	last_triggered: BOOL;
+	start: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+Cont_Timer(IN:= BlueStopper, PT:= T#3S, Q=> , ET=> );
+IF BlueStopper AND Cont_Timer.Q THEN
+	//
+	Reader_Trigger := TRUE;
+ELSE 
+	//
+	Reader_Trigger := FALSE;
+END_IF
+
+//last_triggered := BlueStopper;]]></ST>
+    </Implementation>
+    <LineIds Name="FB_AutoPlace">
+      <LineId Id="15" Count="1" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="19" Count="1" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="24" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

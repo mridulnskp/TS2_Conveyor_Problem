@@ -5,6 +5,8 @@
 VAR_INPUT
     TriggerRead : BOOL;   // input from I_ReaderXX_Trigger
 	BlueOcc : BOOL;
+	ForceDest   : INT := 0; // 0 = random, else fixed destination (12/3/6/9)
+	Source : INT;
 	Dest : Int;
 END_VAR
 VAR_OUTPUT
@@ -14,22 +16,48 @@ END_VAR
 VAR
     lastTrigger : BOOL;
 	I_ReaderValue AT%I*:INT;
-	vTrigger at%Q*: bool;
+	vTrigger AT%Q*: BOOL;
+    seed        : UDINT := 12345;
+    pick        : INT;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
-// detect rising edge
+      <ST><![CDATA[// Rising edge detection
 IF TriggerRead AND NOT lastTrigger THEN
-    Valid := TRUE;           // one-cycle pulse
-    ReaderValue := Dest;     // assign destination
+    IF ForceDest <> 0 THEN
+        // Use forced destination
+        ReaderValue := ForceDest;
+    ELSE
+        // Generate random until != Source
+        REPEAT
+            seed := (1103515245 * seed + 12345);
+            CASE (seed MOD 4) OF
+                0: pick := 12;
+                1: pick := 3;
+                2: pick := 6;
+                3: pick := 9;
+            END_CASE
+        UNTIL pick <> Source
+        END_REPEAT;
+        ReaderValue := pick;
+    END_IF
+    Valid := TRUE;
 ELSE
     Valid := FALSE;
-    ReaderValue := 0;
 END_IF
 
-// update memory
 lastTrigger := TriggerRead;
+//// detect rising edge
+//IF TriggerRead AND NOT lastTrigger THEN
+//    Valid := TRUE;           // one-cycle pulse
+//    ReaderValue := Dest;     // assign destination
+//ELSE
+//    Valid := FALSE;
+//    ReaderValue := 0;
+//END_IF
+
+//// update memory
+//lastTrigger := TriggerRead;
 
 
 
@@ -37,6 +65,7 @@ lastTrigger := TriggerRead;
 ]]></ST>
     </Implementation>
     <LineIds Name="FB_Reader">
+      <LineId Id="129" Count="23" />
       <LineId Id="102" Count="11" />
       <LineId Id="79" Count="2" />
       <LineId Id="59" Count="0" />

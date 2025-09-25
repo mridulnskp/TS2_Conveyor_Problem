@@ -4,6 +4,7 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_TransferChain_UpperToLower
 VAR_INPUT
     StartRequest : BOOL;
+	JobID        : UDINT;     // unique per dispatch
     reset        : BOOL;
 
     // Blue9
@@ -43,6 +44,7 @@ END_VAR
 VAR
     state       : INT := 0;
     lastRequest : BOOL := FALSE;
+	lastJobID  : UDINT := 0;   // store previous job ID
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[CASE state OF
@@ -61,8 +63,9 @@ END_VAR]]></Declaration>
 
     Error := FALSE;
 
-    IF StartRequest AND NOT lastRequest THEN
+    IF StartRequest AND JobID <> lastJobID THEN
         Done := FALSE;
+		lastJobID := JobID;
         state := 1;
     END_IF
 
@@ -156,7 +159,9 @@ END_CASE
 lastRequest := StartRequest;]]></ST>
     </Implementation>
     <LineIds Name="FB_TransferChain_UpperToLower">
-      <LineId Id="50" Count="47" />
+      <LineId Id="50" Count="17" />
+      <LineId Id="209" Count="0" />
+      <LineId Id="68" Count="29" />
       <LineId Id="164" Count="1" />
       <LineId Id="98" Count="10" />
       <LineId Id="166" Count="0" />

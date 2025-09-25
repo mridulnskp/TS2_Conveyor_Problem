@@ -4,6 +4,7 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_DirectTransferGreen
 VAR_INPUT
     StartRequest : BOOL;   // reader triggered with correct Dest
+	JobID        : UDINT;     // unique per dispatch
     LTU1_PosOK   : BOOL;   // e.g. LTU_12_3.PosBottom
     LTU1_Running : BOOL;
     LTU1_LB      : BOOL;   // LightBarrier TRUE=empty
@@ -25,19 +26,26 @@ VAR
     state    : INT := 0;
     tTimeout : TON;
 	reset: BOOL;
+	lastRequest: BOOL;
+	lastJobID  : UDINT := 0;   // store previous job ID
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[CASE state OF
 0: // IDLE
     BlueCmdDown := TRUE; //Blocking
-    Done := FALSE; Error := FALSE;
-    IF StartRequest THEN
-        // command both LTUs down
+    Error := FALSE;
+	
+    // latch Done until new request comes
+    IF StartRequest AND JobID <> lastJobID THEN
+		// command both LTUs down
         LTU1_MoveDown := TRUE;
         LTU2_MoveDown := TRUE;
-        state := 1;
+        Done := FALSE;        // reset Done on new request
+		lastJobID := JobID;
+        state := 1;           // start cycle
     END_IF
+    
 
 1: // ALIGN
     // keep commanding move down until confirmed
@@ -106,10 +114,21 @@ END_VAR
 		 state := 0;
 	END_IF
    
-END_CASE]]></ST>
+END_CASE
+
+// --- Edge detection for StartRequest ---
+//lastRequest := StartRequest;]]></ST>
     </Implementation>
     <LineIds Name="FB_DirectTransferGreen">
-      <LineId Id="72" Count="19" />
+      <LineId Id="72" Count="3" />
+      <LineId Id="149" Count="2" />
+      <LineId Id="155" Count="1" />
+      <LineId Id="154" Count="0" />
+      <LineId Id="152" Count="0" />
+      <LineId Id="195" Count="0" />
+      <LineId Id="153" Count="0" />
+      <LineId Id="147" Count="0" />
+      <LineId Id="81" Count="10" />
       <LineId Id="93" Count="2" />
       <LineId Id="104" Count="11" />
       <LineId Id="138" Count="0" />
@@ -130,6 +149,8 @@ END_CASE]]></ST>
       <LineId Id="122" Count="2" />
       <LineId Id="71" Count="0" />
       <LineId Id="9" Count="0" />
+      <LineId Id="159" Count="1" />
+      <LineId Id="158" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

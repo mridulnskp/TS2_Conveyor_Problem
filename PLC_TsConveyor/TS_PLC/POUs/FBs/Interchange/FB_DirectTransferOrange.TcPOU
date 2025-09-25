@@ -4,6 +4,7 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_DirectTransferOrange
 VAR_INPUT
     StartRequest : BOOL;   // reader detected correct dest
+	JobID        : UDINT;     // unique per dispatch
     LTU1_PosOK   : BOOL;   // LTU1 at Top
     LTU1_Running : BOOL;
     LTU1_LB      : BOOL;
@@ -28,6 +29,8 @@ VAR_OUTPUT
 END_VAR
 VAR
     state : INT := 0;
+	lastRequest: BOOL;
+	lastJobID  : UDINT := 0;   // store previous job ID
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[CASE state OF
@@ -35,11 +38,13 @@ END_VAR]]></Declaration>
     BlueCmdDown    := TRUE;//blocking
     Purple1CmdDown := FALSE;//release
     Purple2CmdDown := FALSE;//release
-    Done := FALSE; Error := FALSE;
+    Error := FALSE;
 
-    IF StartRequest THEN
+    IF StartRequest AND JobID <> lastJobID THEN
         LTU1_MoveUp := TRUE;
         LTU2_MoveUp := TRUE;
+		Done := FALSE; 
+		lastJobID := JobID;
         state := 1;
     END_IF
 
@@ -106,10 +111,16 @@ END_VAR]]></Declaration>
     IF reset THEN
         state := 0;
     END_IF
-END_CASE]]></ST>
+END_CASE
+
+// --- Edge detection for StartRequest ---
+lastRequest := StartRequest;]]></ST>
     </Implementation>
     <LineIds Name="FB_DirectTransferOrange">
-      <LineId Id="106" Count="19" />
+      <LineId Id="106" Count="9" />
+      <LineId Id="212" Count="0" />
+      <LineId Id="245" Count="0" />
+      <LineId Id="116" Count="9" />
       <LineId Id="127" Count="17" />
       <LineId Id="203" Count="0" />
       <LineId Id="145" Count="4" />
@@ -118,6 +129,8 @@ END_CASE]]></ST>
       <LineId Id="209" Count="0" />
       <LineId Id="150" Count="28" />
       <LineId Id="9" Count="0" />
+      <LineId Id="215" Count="1" />
+      <LineId Id="214" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

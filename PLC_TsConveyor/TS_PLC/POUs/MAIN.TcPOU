@@ -76,6 +76,9 @@ VAR
 	SchedulerBusy: BOOL;
 	SchedulerQCount: INT;
 	StartHomingGlobal: BOOL;
+	OnTimer : ton;
+	Start: BOOL;
+	Auto_Reader12 : FB_AutoPlace;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -95,7 +98,9 @@ END_VAR
     LTU_9_12 := LTU_9_12,
     Scheduler := Scheduler
 );
-
+IF AllLTUsHomed THEN
+	Auto_Reader12(BlueStopper:= Blue12.CmdDown, Reader_Trigger=> Reader12.TriggerRead);
+END_IF
 Conv12_6(
 	CmdRunRequest:= TRUE, 
 	MotorOK:= , 
@@ -211,10 +216,10 @@ Purple3_9_1(CmdDown:= , OccupiedIn:= , StopperDown=> , Occupied=> );
 Purple3_9_2(CmdDown:= , OccupiedIn:= , StopperDown=> , Occupied=> );	
 
 	
-Reader12(TriggerRead:= ,Dest:=9, ReaderValue=> , Valid=> );	
-Reader3(TriggerRead:= ,Dest:=6, ReaderValue=> , Valid=> );	
-Reader6(TriggerRead:= ,Dest:=9, ReaderValue=> , Valid=> );	
-Reader9(TriggerRead:= ,Dest:=6, ReaderValue=> , Valid=> );	
+Reader12(TriggerRead:= ,Dest:=6,Source:=12, ReaderValue=> , Valid=> );	
+Reader3(TriggerRead:= ,Dest:=6,Source:=3, ReaderValue=> , Valid=> );	
+Reader6(TriggerRead:= ,Dest:=9,Source:=6, ReaderValue=> , Valid=> );	
+Reader9(TriggerRead:= ,Dest:=6,Source:=9, ReaderValue=> , Valid=> );	
 
 // === Homing Manager ===
 HomingMgr(
@@ -324,7 +329,7 @@ END_IF
 
 CASE Scheduler.activeRoute OF
 	//..................*** Direct Transfer Green or Lower
-	126:Transfer_12_6(
+	126:Transfer_12_6(JobID := Scheduler.JobID_12_6,
 		StartRequest := Scheduler.Start_12_6,
 		LTU1_PosOK   := LTU_12_3.PosBottom,
 		LTU1_Running := LTU_12_3.IsRunning,
@@ -340,7 +345,7 @@ CASE Scheduler.activeRoute OF
 		LTU1_MoveDown=> LTU_12_3.CmdMoveDown,
 		LTU2_MoveDown=>	LTU_3_6.CmdMoveDown,
 	);
-	612:Transfer_6_12(
+	612:Transfer_6_12(JobID := Scheduler.JobID_6_12,
 		StartRequest := Scheduler.Start_6_12,
 		LTU1_PosOK   := LTU_6_9.PosBottom,
 		LTU1_Running := LTU_6_9.IsRunning,
@@ -358,7 +363,7 @@ CASE Scheduler.activeRoute OF
 	);
 	DebugWhoWroteBlue6 := 'Transfer_6_12';
 	//.................*** Direct Transfer Orange or Upper
-	93:Transfer_9_3(
+	93:Transfer_9_3(JobID := Scheduler.JobID_9_3,
 		StartRequest:= Scheduler.Start_9_3, 
 		LTU1_PosOK:= LTU_9_12.PosTop, 
 		LTU1_Running:= LTU_9_12.IsRunning, 
@@ -379,7 +384,7 @@ CASE Scheduler.activeRoute OF
 		Error=> 
 	);
 	
-	39:Transfer_3_9(
+	39:Transfer_3_9(JobID := Scheduler.JobID_3_9,
 		StartRequest := Scheduler.Start_3_9,
 	
 		// LTU_3_6
@@ -411,7 +416,7 @@ CASE Scheduler.activeRoute OF
 	);
 	
 	//.........*************lower to upper corner****************
-	123:Transfer_12_3(
+	123:Transfer_12_3(JobID := Scheduler.JobID_12_3,
 		StartRequest:= Scheduler.Start_12_3, 
 		LTU_PosTop:= LTU_12_3.PosTop, 
 		LTU_PosBottom:= LTU_12_3.PosBottom, 
@@ -428,7 +433,7 @@ CASE Scheduler.activeRoute OF
 		Done=> , 
 		Error=> );
 		
-	69:Transfer_6_9(
+	69:Transfer_6_9(JobID := Scheduler.JobID_6_9,
 		StartRequest := Scheduler.Start_6_9,
 	
 		// LTU_6_9
@@ -455,7 +460,7 @@ CASE Scheduler.activeRoute OF
 	);
 	DebugWhoWroteBlue6 := 'Transfer_6_9';
 	//...........**************Upper to Lower Corner.............................
-	36:Transfer_3_6(
+	36:Transfer_3_6(JobID := Scheduler.JobID_3_6,
 		StartRequest  := Scheduler.Start_3_6,
 	
 		LTU_PosTop    := LTU_3_6.PosTop,
@@ -477,7 +482,7 @@ CASE Scheduler.activeRoute OF
 		Done          => ,
 		Error         => 
 	);
-	912:Transfer_9_12(
+	912:Transfer_9_12(JobID := Scheduler.JobID_9_12,
 		StartRequest  := Scheduler.Start_9_12,
 	
 		LTU_PosTop    := LTU_9_12.PosTop,
@@ -503,7 +508,7 @@ CASE Scheduler.activeRoute OF
 	
 	// ............ Multi-hop transfer (12 -> 9) .............................
 	//.......Lower to Upper Chain transfer....................................
-	129:Transfer_12_9(
+	129:Transfer_12_9(JobID := Scheduler.JobID_12_9,
 		StartRequest  := Scheduler.Start_12_9,
 		reset         := ,
 	
@@ -554,7 +559,7 @@ CASE Scheduler.activeRoute OF
 		Done          => ,
 		Error         => 
 	);
-	63:Transfer_6_3(
+	63:Transfer_6_3(JobID := Scheduler.JobID_6_3,
 		StartRequest  := Scheduler.Start_6_3,
 		reset         := ,
 	
@@ -608,7 +613,7 @@ CASE Scheduler.activeRoute OF
 	DebugWhoWroteBlue6 := 'Transfer_6_3';
 	
 	//.......Upper to Lower Chain transfer....................................
-	96:Transfer_9_6(
+	96:Transfer_9_6(JobID := Scheduler.JobID_9_6,
 		StartRequest  := Scheduler.Start_9_6,
 		reset         := ,
 	
@@ -657,7 +662,7 @@ CASE Scheduler.activeRoute OF
 		Done          => ,
 		Error         => 
 	);	
-	312:Transfer_3_12(
+	312:Transfer_3_12(JobID := Scheduler.JobID_3_12,
 		StartRequest  := Scheduler.Start_3_12,
 		reset         := ,
 	
@@ -732,11 +737,15 @@ Throughput(
     Reset := 
 );
 
+
+
 ]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
       <LineId Id="1063" Count="15" />
+      <LineId Id="1231" Count="0" />
       <LineId Id="191" Count="0" />
+      <LineId Id="1232" Count="0" />
       <LineId Id="198" Count="5" />
       <LineId Id="192" Count="0" />
       <LineId Id="207" Count="0" />
@@ -818,7 +827,8 @@ Throughput(
       <LineId Id="1096" Count="0" />
       <LineId Id="1109" Count="16" />
       <LineId Id="1081" Count="0" />
-      <LineId Id="820" Count="0" />
+      <LineId Id="1226" Count="1" />
+      <LineId Id="1225" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
